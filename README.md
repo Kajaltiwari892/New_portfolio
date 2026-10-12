@@ -1,24 +1,14 @@
-# Motion Portfolio
+# Simple portfolio
 
-A Fizzi-inspired portfolio MVP with an original visual direction: real Three.js sculpture, GSAP scroll motion, floating UI windows and a color-changing project showcase.
+A lightweight, single-page portfolio using Vite, plain JavaScript, and CSS. The previous city and cinematic experience have been removed.
 
-## Run locally
-```sh
-npm install
-npm run dev
-```
-Open the URL printed by Vite (normally http://127.0.0.1:5173).
+## Run
 
-## Production
-```sh
-npm run build
-npm run preview
-```
-Deploy `dist/` to a static host such as Vercel. No environment variables or backend required.
+Run `npm install`, then `npm run dev`. `npm run build` produces the static site in `dist/`.
 
-## Make it yours
-Edit `src/content.js` for your name, role, bio, email, social links and project details. Sample projects are explicitly labeled; replace them before a public launch. Set `live` and `source` URLs to enable real project links. Replace the previews in `src/main.js` with your project screenshots or custom scenes. `PLAN.md` documents the content journey and MVP scope.
+## Content
 
-Reduced motion disables scroll pinning and continuous animation. WebGL failures fall back to a CSS visual. On small screens, the project stage becomes a normal section with buttons instead of a pinned scroll experience.
+The hero uses the user's supplied photo at `public/girl-portrait.png`. Update the name and email in `src/content.js`. The project, biography, and contact sections currently indicate that personal content is coming soon. Add verified project details and links in `src/main.js` when available.
 
-Inspiration: https://fizzi-demo.vercel.app/ and https://github.com/Kajaltiwari892/Fizzi. No reference source or branded assets are copied.
+The page uses native anchor navigation, visible keyboard focus, responsive styles, and reduced-motion preferences. It has no runtime framework, 3D, or animation dependencies.
+
