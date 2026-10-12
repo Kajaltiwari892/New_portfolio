@@ -1,11 +1,19 @@
-# Simple portfolio
+# Personal homepage redesign
 
-The city concept has been removed at the user's request.
+The user requested inspiration from https://heheboi.in/ and removal of the supplied photo.
 
-- A quiet dark layout inspired by the supplied Figma reference.
-- The exact attached girl-on-a-palm photo is the hero visual.
-- Simple navigation to Work, About, and Contact.
-- Honest placeholders until the user's name, projects, biography, and contact details are supplied.
-- Responsive layout, standard page scrolling, keyboard navigation, and reduced-motion support.
-- No 3D world, walking avatar, cinematic opening, checkpoints, or animation dependencies.
+## Direction
+- Light paper-like background, blue accents, centered personal introduction.
+- Original illustrated collage instead of photographs.
+- Work preview with a project story, a personal card grid, and a tabbed toolbox.
+- Persistent light/dark theme, ordinary scrolling, and restrained hover interactions.
+
+## Content
+The user's name, role, real project links, and contact information have been requested but not supplied. Name and contact remain explicit placeholders. The only featured project is this portfolio itself; no employment history, metrics, external projects, or social profiles are fabricated. About copy is draft copy based on the user's stated interest in thoughtful, distinctive design.
+
+## Interaction and accessibility
+- Native modal project details, Escape dismissal, focus restoration.
+- Keyboard-accessible toolbox tabs.
+- Active navigation and a skip link.
+- Reduced-motion support and responsive layouts.
 

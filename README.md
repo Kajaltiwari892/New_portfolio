@@ -1,14 +1,20 @@
-# Simple portfolio
+# My Space — personal portfolio
 
-A lightweight, single-page portfolio using Vite, plain JavaScript, and CSS. The previous city and cinematic experience have been removed.
+A responsive personal homepage using Vite, plain JavaScript, and CSS. Inspired by the structure and personal feel of the supplied heheboi.in reference, with original layout details and SVG illustrations.
 
 ## Run
+Run `npm install`, then `npm run dev`. Run `npm run build` to create `dist/`.
 
-Run `npm install`, then `npm run dev`. `npm run build` produces the static site in `dist/`.
+## Edit
+- `src/content.js`: name, role, introduction, About draft, email, GitHub, and LinkedIn. Missing contact links are not rendered.
+- `src/main.js`: sections, the portfolio project story, and toolbox content.
+- `src/style.css`: responsive styles and light/dark themes.
+- `src/illustrations.js`: original inline SVG collage and project preview.
 
-## Content
+The name and personal contact details remain unfilled until supplied. This portfolio is the only featured project so far. No actual work history or external projects have been invented.
 
-The hero uses the user's supplied photo at `public/girl-portrait.png`. Update the name and email in `src/content.js`. The project, biography, and contact sections currently indicate that personal content is coming soon. Add verified project details and links in `src/main.js` when available.
+## Included
+Persistent theme preference, native project dialog with focus restoration, accessible tab keyboard controls, scroll-aware navigation, reduced-motion handling, and responsive layouts.
 
-The page uses native anchor navigation, visible keyboard focus, responsive styles, and reduced-motion preferences. It has no runtime framework, 3D, or animation dependencies.
+The previous girl photo and all city/3D code are removed. There are no runtime framework or animation dependencies.
 
