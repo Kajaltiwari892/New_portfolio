@@ -89,6 +89,9 @@ export const Timeline = ({
         <div
           style={{
             height: height + "px",
+            // Tailwind v4 requires a direction token for the registry's gradient stops.
+            // An explicit track gradient keeps the unfilled timeline visible in both themes.
+            backgroundImage: "linear-gradient(to bottom, transparent, var(--line) 10%, var(--line) 90%, transparent)",
           }}
           className="absolute md:left-8 left-8 top-0 overflow-hidden w-[2px] bg-[linear-gradient(to_bottom,var(--tw-gradient-stops))] from-transparent from-[0%] via-neutral-200 dark:via-neutral-700 to-transparent to-[99%]  [mask-image:linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)] "
         >
