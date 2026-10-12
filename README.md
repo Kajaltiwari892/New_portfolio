@@ -1,6 +1,6 @@
-# Folio — personal portfolio
+# Folio personal portfolio
 
-A responsive editorial portfolio built with React, TypeScript, Vite, and Tailwind CSS v4. Light paper surfaces, blue accents, original interface illustrations, and restrained motion support eight sections: Home, Work, About, Strengths, Approach, Notes, Questions, and Contact. A persistent dark theme is also available.
+A responsive portfolio built with React, TypeScript, Vite, and Tailwind CSS v4. Five separate hash-routed pages share a compact header, footer, and persistent light/dark theme. The supplied PDF informed the warm paper, coral accents, soft pastel cards, editorial typography, and personal scrapbook direction. Its example people, hobbies, and projects are references, not facts about this portfolio's owner.
 
 ## Run locally
 
@@ -9,7 +9,7 @@ npm ci
 npm run dev
 ```
 
-Open the URL printed by Vite. `npm run typecheck` checks TypeScript, `npm run build` checks types and creates `dist/`, and `npm run preview` serves that production build locally.
+Open the URL printed by Vite. `npm run typecheck` checks TypeScript, `npm run build` checks types and creates `dist/`, and `npm run preview` serves the production build locally.
 
 If the npm launcher is broken in the current Windows environment, run npm through Node:
 
@@ -18,53 +18,71 @@ node 'C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js' ci
 node 'C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js' run dev
 ```
 
-## What is implemented
+## Pages and navigation
 
-- **Work:** three interactive studies with category filters, working demos, and challenge/approach/result descriptions in dialogs.
-- **Taskboard:** add, move, delete, and reset tasks across three stages; up to 40 tasks, saved in this browser.
-- **Focus timer:** 5-, 15-, 25-, and 50-minute sessions with start, pause, reset, and progress feedback. The saved deadline restores the correct remaining time when the preview reopens.
-- **Palette lab:** cycle through five curated palettes, preview each in context, and copy individual hex values. Clipboard failures provide an alternative instruction.
-- **About and Strengths:** an illustrated bento layout and three areas of focus.
-- **Approach:** a four-step process timeline: Understand, Explore, Make, and Refine.
-- **Notes and Questions:** three complete articles in dialogs and four expandable FAQ answers.
-- **Contact:** a local project-brief draft with a copy action while an email address is unset.
+| Page | URL fragment | Content |
+| --- | --- | --- |
+| Home | `#/` | Compact introduction, original paper/browser illustration, and four destination cards |
+| Work | `#/work` | Three working studies, category filters, interactive demos, and study descriptions |
+| About | `#/about` | Draft introduction, three expandable skill areas, and an expandable four-step process timeline |
+| Beyond work | `#/beyond` | Six illustrated board cards with full details or articles and locally saved hearts |
+| Contact | `#/contact` | A local project-brief draft and copy action until real contact details are supplied |
 
-The interface includes a skip link, scroll-aware navigation, keyboard controls, visible focus, dialog focus restoration, responsive layouts, and reduced-motion handling.
+Each fragment can be opened directly after the site's base URL. Native links preserve browser Back/Forward history without requiring server-side route rewrites. Page changes update the document title, return to the top, and move focus to the new heading after initial navigation. The skip link focuses the current main content without replacing its route fragment. Unknown fragments show a page-not-found view.
 
-## Actual component sources
+Legacy links remain supported: `#home`, `#work`, `#about`, and `#contact` open their matching pages; `#approach` opens About; `#notes` and `#/hobbies` open Beyond work; `#questions` opens Contact. An empty fragment opens Home. The parser also preserves the current route for `#main`.
 
-The app imports locally installed source components from the official registries:
+## Working interactions
+
+- **Taskboard:** add, move, delete, and reset tasks across three stages. Up to 40 tasks persist in this browser.
+- **Focus timer:** choose 5, 15, 25, or 50 minutes; start, pause, and reset. A saved deadline restores elapsed time when the preview reopens.
+- **Palette lab:** cycle through five curated palettes, preview each, and copy individual hex values. Selection is temporary.
+- **Beyond work:** open six cards covering color, typography, an original drawing, and three complete articles about clarity, motion, and responsive content. Save or unsave each card using its heart; selections persist on this device.
+- **Contact draft:** write up to 5,000 characters and copy the brief. It does not send a message.
+
+Dialogs include keyboard behavior and focus restoration. Controls provide visible focus and feedback; layouts adapt to phones and desktop widths, and motion respects reduced-motion preferences.
+
+## Component sources
+
+The project contains real source components from the official registries:
 
 - [shadcn/ui](https://ui.shadcn.com/docs/components): Button, Badge, Tabs, Dialog, Accordion, and Tooltip, backed by Radix primitives.
-- Aceternity UI: [Bento Grid](https://ui.aceternity.com/components/bento-grid) for About, [Timeline](https://ui.aceternity.com/components/timeline) for Approach, and [Text Generate Effect](https://ui.aceternity.com/components/text-generate-effect) for the introduction.
+- Aceternity UI: [Timeline](https://ui.aceternity.com/components/timeline) for the About process and [Text Generate Effect](https://ui.aceternity.com/components/text-generate-effect) for the Home introduction. [Bento Grid](https://ui.aceternity.com/components/bento-grid) is installed but is not used by the current page layout.
 
-Each component file retains its registry source URL. Local adaptations add theme integration, reduced-motion support, animation cleanup, and responsive timeline measurements. Timeline's stock biography was removed; its optional heading and description are caller-owned. Motion powers the animations, and Lucide supplies icons.
+Component headers retain registry source URLs. Adaptations include theme integration, reduced-motion support, animation cleanup, and responsive timeline measurements. The timeline's stock biography was removed; it describes a process rather than employment history. Motion powers transitions, and Lucide supplies icons.
 
 ## Where to edit
 
 | File | Purpose |
 | --- | --- |
-| `src/portfolio-content.ts` | Profile fields, study descriptions, strengths, process, articles, and FAQ |
-| `src/App.tsx` | Eight-section layout, preview artwork, dialogs, navigation, theme, and contact draft |
+| `src/App.tsx` | Five page layouts, navigation, title/focus handling, theme, and contact presentation |
+| `src/lib/portfolio-router.ts` | Hash parsing, route links, and history subscription |
+| `src/portfolio-content.ts` | Profile fields, study descriptions, process, and articles; older unused content exports remain available |
+| `src/components/portfolio-pieces.tsx` | Project cards, study dialogs, mark, and local contact draft |
 | `src/components/project-demos.tsx` | Taskboard, Focus timer, and Palette lab behavior |
-| `src/components/ui/` | Official shadcn source components |
-| `src/components/aceternity/` | Official Aceternity source components and documented adaptations |
+| `src/components/beyond-board.tsx` | Six board cards, detail dialogs, original illustrations, and saved hearts |
+| `src/components/ui/`, `src/components/aceternity/` | Official component sources and local adaptations |
 | `src/tailwind.css` | Tailwind v4 imports, shadcn tokens, and animation utilities |
-| `src/style.css` | Portfolio art direction, light/dark themes, and responsive rules |
-| `src/main.tsx` | React entry; imports Tailwind before the portfolio styles |
-| `components.json` | Component registry configuration and aliases |
-| `vite.config.ts`, `tsconfig*.json` | React/Tailwind setup and the `@/` to `src/` alias |
+| `src/style.css` | Shared typography, controls, study previews, and responsive styles |
+| `src/pages.css` | Warm page themes, route layouts, Home art, and navigation |
+| `src/beyond-board.css` | Board, card, and detail-dialog presentation |
+| `src/main.tsx` | React entry and stylesheet imports |
+| `components.json`, `vite.config.ts`, `tsconfig*.json` | Registry configuration, React/Tailwind setup, and the `@/` alias |
 
-## Content and personal details
+## Personal content and privacy
 
-`profile.name`, `email`, `github`, and `linkedin` are deliberately `null`. The interface uses the neutral name “folio” and renders external profile links only when supplied. Setting an email changes the contact action to a `mailto:` link; it does not add a server-side form.
+`profile.name`, `email`, `github`, and `linkedin` remain `null`. The interface uses the neutral name "folio" and displays external profile links only when supplied. Setting an email changes the contact action to `mailto:`; it does not add a form submission service. The owner's photograph can be added later; no substitute portrait is included.
 
-Taskboard, Focus timer, and Palette lab are working studies created for this portfolio, not claims of previous client projects. About copy, strengths, process, and articles are draft editorial content for the owner to review. No employment history, client names, testimonials, results metrics, or external project links have been invented. The user's own photograph can be added later; no substitute portrait is included.
+Taskboard, Focus timer, and Palette lab are working studies created for this site. The first-person copy, skill descriptions, process, and articles are drafts for the owner to review. No employers, employment dates, credentials, client projects, testimonials, or performance metrics have been invented. The Beyond board contains design experiments and editorial notes rather than unverified personal hobbies. Older FAQ and strength data remain in the content module but are not separate pages in this version.
 
-## Local data and contact behavior
+There is no application backend, account system, analytics integration, or message-submission endpoint. Clipboard writes happen only after a copy action. Local storage contains:
 
-There is no application backend, account system, analytics integration, or message-submission endpoint. The contact draft does **not** send a message. Copy actions write to the clipboard only when clicked.
+| Key | Data |
+| --- | --- |
+| `portfolio-theme` | Light/dark preference |
+| `portfolio-taskboard-v1` | Taskboard tasks |
+| `portfolio-focus-v1` | Timer state |
+| `portfolio-inspiration-saved-v1` | IDs of saved Beyond board cards |
+| `portfolio-project-brief` | Contact draft |
 
-Local storage holds the theme (`portfolio-theme`), tasks (`portfolio-taskboard-v1`), timer state (`portfolio-focus-v1`), and contact draft (`portfolio-project-brief`). These values are local to the site's browser origin; they are not encrypted or synchronized between devices. Clearing this site's browser data removes them. Palette selection is temporary. Storage failures are handled so the interface remains usable.
-
-The page loads DM Sans and Manrope from Google Fonts. Those font requests are external; the application does not include stored tasks or contact drafts in them.
+These values belong to the site's browser origin. They are not encrypted or synchronized between devices; clearing the site's browser data removes them. Storage failures leave the interactions usable for the current visit. Google Fonts supplies DM Sans and Manrope through external requests; stored tasks and drafts are not included in those requests.

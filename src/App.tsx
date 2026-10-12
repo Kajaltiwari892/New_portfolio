@@ -1,102 +1,104 @@
-import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
-import { ArrowDown, ArrowRight, ArrowUpRight, Check, Code2, Copy, Layers3, Lightbulb, Mail, Moon, MousePointer2, Palette, PenTool, Sparkles, Sun, Workflow } from "lucide-react";
-import { MotionConfig } from "motion/react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { MotionConfig, motion, useReducedMotion } from "motion/react";
+import { ArrowRight, ArrowUpRight, Check, Code2, Copy, Layers3, Lightbulb, Mail, Moon, PenTool, Sparkles, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { BentoGrid, BentoGridItem } from "@/components/aceternity/bento-grid";
 import { Timeline } from "@/components/aceternity/timeline";
 import { TextGenerateEffect } from "@/components/aceternity/text-generate-effect";
-import { TaskboardDemo, FocusDemo, PaletteDemo } from "@/components/project-demos";
-import { profile, caseStudies, strengths, process, notes, faqs } from "@/portfolio-content";
+import { BeyondBoard } from "@/components/beyond-board";
+import { BriefDialog, Mark, ProjectCard } from "@/components/portfolio-pieces";
+import { usePortfolioRoute, routeHref, type PortfolioRoute } from "@/lib/portfolio-router";
+import { profile, caseStudies, process } from "@/portfolio-content";
 
-type Study = typeof caseStudies[number];
-const nav = [["Work","work"],["About","about"],["Approach","approach"],["Notes","notes"]];
-const palette = ["#f0e3e0","#dec6d7","#c1bfdc","#8e94bb","#535879"];
+const destinations = [
+  { id: "work" as const, label: "Work", number: "01", title: "Things I’ve made.", description: "Small tools, thoughtful details. Open a project and give it a go.", link: "Explore the work", icon: Layers3 },
+  { id: "about" as const, label: "About", number: "02", title: "A little about me.", description: "The ideas, tools, and approach behind what I make.", link: "Get to know me", icon: PenTool },
+  { id: "beyond" as const, label: "Beyond work", number: "03", title: "The curious corner.", description: "Colors, experiments, and a few thoughts worth keeping.", link: "Take a little detour", icon: Sparkles },
+  { id: "contact" as const, label: "Contact", number: "04", title: "Start something good.", description: "Have an idea? A good conversation starts with a small thought.", link: "Let’s talk", icon: ArrowUpRight },
+];
+const navigation = [{ id: "home" as const, label: "Home" }, ...destinations];
+const skills = [
+  { title: "Make it clear.", summary: "Websites that help people find their way.", description: "I start with the useful bit: what should someone understand or do? Then I give the content an order, make the important action easy to spot, and let the details support it.", tools: ["Visual hierarchy", "Responsive layouts", "Clear writing"], icon: PenTool },
+  { title: "Make it work.", summary: "Turn a promising idea into something you can use.", description: "I like moving into the browser early. A working button or a tiny prototype tells you things a static screen can’t. The studies here explore real states, feedback, and everyday interactions.", tools: ["React", "TypeScript", "Tailwind CSS"], icon: Code2 },
+  { title: "Make it feel right.", summary: "Small details that make the whole thing feel easier.", description: "A helpful empty state. A clear keyboard path. A transition that explains what changed. Those little moments get the same attention as the first screen.", tools: ["Accessible controls", "Motion", "Careful testing"], icon: Sparkles },
+];
 
-function Mark({className=""}:{className?:string}) { return <svg className={className} viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 5v30M5 20h30M9.4 9.4l21.2 21.2M9.4 30.6 30.6 9.4" stroke="currentColor" strokeWidth="5" strokeLinecap="round"/></svg>; }
-function SectionHeading({label,title,description,index}:{label:string;title:string;description?:string;index:string}) { return <div className="section-heading"><div><p className="eyebrow"><span/>{label}</p><h2>{title}</h2>{description&&<p className="section-description">{description}</p>}</div><span className="section-number">{index}</span></div>; }
-
-function BoardPreview() { return <div className="preview-board" aria-hidden="true"><div className="mini-browser"><span/><span/><span/><small>Taskboard / My workspace</small></div><div className="mini-board-heading"><strong>A clear head starts here.</strong><span>+ New task</span></div><div className="mini-columns">{["To do","In progress","Done"].map((title,i)=><div key={title}><span className="mini-column-title"><i/>{title}</span>{Array.from({length:i===0?3:2},(_,j)=><div key={j} className="mini-task"><i className={"mini-label label-"+((i+j)%3)}/><span className="mini-task-line"/><span className="mini-task-line short"/><div><b/>{i===2?<Check size={9}/>:<span>···</span>}</div></div>)}</div>)}</div><div className="board-cursor"><MousePointer2 size={21} fill="#6e62be"/><span>make progress</span></div></div>; }
-function FocusPreview() { return <div className="preview-focus" aria-hidden="true"><div className="focus-top"><span><span/> a moment of focus</span><span>···</span></div><div className="preview-clock"><span>TIME FOR ONE THING</span><strong>25<span>:</span>00</strong><small>Less noise. More headspace.</small></div><div className="preview-focus-controls"><span>▶ Start a session</span><i>↻</i></div><div className="focus-bottom"><span>find your rhythm.</span><svg viewBox="0 0 110 20"><path d="M2 12Q10 0 20 12T40 12T60 12T80 12T100 12" fill="none" stroke="currentColor"/></svg></div></div>; }
-function PalettePreview() { return <div className="preview-palette" aria-hidden="true"><div className="palette-mini-top"><Palette size={14}/><span>palette / play</span><span>↗</span></div><h4>A different kind<br/>of <em>feeling.</em></h4><div className="mini-swatches">{palette.map((color,i)=><div key={color} style={{background:color,transform:`translateY(${[10,0,15,5,20][i]}px) rotate(${[-5,-2,2,4,7][i]}deg)`}}><span>{color}</span></div>)}</div></div>; }
-
-// A dialog may have several entry points; Radix otherwise restores its last trigger.
-function useDialogOpenerFocus() {
-  const opener = useRef<HTMLButtonElement | null>(null);
-  return {
-    capture: (event: MouseEvent<HTMLButtonElement>) => { opener.current = event.currentTarget; },
-    restore: (event: Event) => {
-      if (opener.current?.isConnected) {
-        event.preventDefault();
-        opener.current.focus({ preventScroll: true });
-      }
-    },
-  };
+function PageIntro({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
+  return <div className="page-intro"><p className="eyebrow"><span />{eyebrow}</p><h1 tabIndex={-1} data-page-heading>{title}</h1><p className="page-description">{description}</p></div>;
 }
 
-function ProjectCard({study,index}:{study:Study;index:number}) {
-  const [open,setOpen]=useState(false);
-  const projectFocus = useDialogOpenerFocus();
-  return <Dialog open={open} onOpenChange={setOpen}><article className={"project-card project-"+study.id}>
-    <DialogTrigger asChild><button onClick={projectFocus.capture} className="project-image" aria-label={"Explore "+study.title}>{study.id==="board"?<BoardPreview/>:study.id==="focus"?<FocusPreview/>:<PalettePreview/>}<span className="project-open"><ArrowUpRight size={19}/></span></button></DialogTrigger>
-    <div className="project-copy"><div className="project-overline"><span>0{index+1} / {study.id==="palette"?"DESIGN TOOL":"PRODUCTIVITY"}</span><Badge variant="outline">Interactive study</Badge></div><DialogTrigger asChild><button onClick={projectFocus.capture} className="project-title"><h3>{study.title}</h3><ArrowUpRight size={19}/></button></DialogTrigger><p>{study.summary}</p><div className="project-stack">{study.stack.map(item=><span key={item}>{item}</span>)}</div><DialogTrigger asChild><Button onClick={projectFocus.capture} variant="ghost" className="study-link">Explore the study <ArrowRight size={15}/></Button></DialogTrigger></div>
-  </article><DialogContent className="study-dialog" onCloseAutoFocus={projectFocus.restore}><DialogHeader><div className="eyebrow"><span/>INTERACTIVE STUDY</div><DialogTitle>{study.title}</DialogTitle><DialogDescription>{study.summary}</DialogDescription></DialogHeader><Tabs defaultValue="demo" className="study-tabs"><TabsList><TabsTrigger value="demo">Try it out</TabsTrigger><TabsTrigger value="story">The thinking behind it</TabsTrigger></TabsList><TabsContent value="demo">{open&&(study.id==="board"?<TaskboardDemo/>:study.id==="focus"?<FocusDemo/>:<PaletteDemo/>)}</TabsContent><TabsContent value="story"><div className="case-study-copy">{[["The challenge",study.challenge],["The approach",study.approach],["The result",study.outcome]].map(([title,body])=><section key={title}><h3>{title}</h3><p>{body}</p></section>)}<div className="case-stack">{study.stack.map(item=><Badge variant="secondary" key={item}>{item}</Badge>)}</div></div></TabsContent></Tabs></DialogContent></Dialog>;
+function HomePage() {
+  return <section className="home-page" aria-label="Home">
+    <div className="home-intro"><div className="home-copy"><p className="eyebrow"><span />{profile.name ? `WELCOME TO ${profile.name.toUpperCase()}’S CORNER` : "A PERSONAL CORNER OF THE INTERNET"}</p>
+      <h1 tabIndex={-1} data-page-heading>A little design.<br />A little code.<br /><em>A lot of curiosity.</em></h1>
+      <TextGenerateEffect className="home-description" textClassName="home-description-text" words="I like turning a what-if into something you can click, use, and enjoy. This is a small collection of things I’m making and ideas I’m exploring." duration={0.3} staggerDelay={0.018} />
+      <div className="hero-actions"><Button asChild><a href={routeHref("work")}>See my work <ArrowUpRight size={17} /></a></Button><Button asChild variant="outline"><a href={routeHref("contact")}>Say hello <ArrowRight size={16} /></a></Button></div>
+    </div><div className="home-art" aria-hidden="true"><span className="art-label">a few things in the making</span><div className="art-window"><div className="art-window-bar"><i /><i /><i /><span>little ideas / in progress</span></div><div className="art-window-body"><span>FROM A SMALL IDEA</span><strong>what if<br />we tried <em>this?</em></strong><div><i /><i /><i /></div></div></div><div className="art-note"><span>A SMALL REMINDER</span><strong>Make something<br />worth exploring.</strong><svg viewBox="0 0 120 24" fill="none"><path d="M3 17Q25 4 46 15T88 13Q101 7 117 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg></div><Mark className="art-star" /><span className="art-small-label"><span /> always a work in progress</span></div></div>
+    <div className="home-directory-heading"><span>PICK A PLACE TO START</span><span>A few doors. Your own pace. <ArrowRight size={13} /></span></div>
+    <div className="destination-grid">{destinations.map(item => <a key={item.id} className={"destination-card destination-" + item.id} href={routeHref(item.id)}><div className="destination-top"><span className="destination-icon"><item.icon size={23} /></span><span className="destination-number">{item.number} / {item.label}</span></div><h2>{item.title}</h2><p>{item.description}</p><span className="destination-link">{item.link}<ArrowUpRight size={18} /></span></a>)}</div>
+  </section>;
 }
 
-function BriefDialog() {
-  const [brief,setBrief]=useState(()=>{try{return localStorage.getItem("portfolio-project-brief")||"";}catch{return"";}});
-  const [status,setStatus]=useState("");
-  const timer=useRef<number|undefined>(undefined);
-  useEffect(()=>()=>clearTimeout(timer.current),[]);
-  const update=(value:string)=>{setBrief(value);setStatus("");try{localStorage.setItem("portfolio-project-brief",value);}catch{}};
-  const copy=async()=>{clearTimeout(timer.current);try{await navigator.clipboard.writeText(brief);setStatus("Copied. Your brief is ready to share.");}catch{setStatus("Select the text and copy it with your keyboard.");}timer.current=window.setTimeout(()=>setStatus(""),4000);};
-  return <Dialog><DialogTrigger asChild><Button className="contact-button">Start with an idea <ArrowUpRight size={17}/></Button></DialogTrigger><DialogContent className="brief-dialog"><DialogHeader><DialogTitle>Tell me what you have in mind.</DialogTitle><DialogDescription>A useful brief starts with the problem, the people, and the result you want.</DialogDescription></DialogHeader><div className="brief-prompts"><span>Who is it for?</span><span>What should it help them do?</span><span>What matters most?</span></div><label htmlFor="project-brief">Your project idea</label><textarea id="project-brief" value={brief} maxLength={5000} onChange={e=>update(e.target.value)} placeholder="I’m thinking about a website or tool that…"/><p className="local-note">This is a private draft in this browser. It does not send a message.</p><div className="brief-actions"><Button onClick={copy} disabled={!brief.trim()}><Copy size={15}/> Copy your brief</Button><span role="status">{status}</span></div></DialogContent></Dialog>;
+function WorkPage() {
+  const [filter, setFilter] = useState("all");
+  const visible = caseStudies.filter(study => filter === "all" || (filter === "design" ? study.id === "palette" : study.id !== "palette"));
+  return <section className="content-page work-page" aria-label="Work"><PageIntro eyebrow="THINGS I’VE BEEN MAKING" title="Small ideas. Real things." description="A few things to click around in. Open a study to try it out, or peek at the decisions behind it." />
+    <Tabs value={filter} onValueChange={setFilter} className="work-tabs"><div className="work-toolbar"><TabsList aria-label="Filter projects"><TabsTrigger value="all">All work <span>03</span></TabsTrigger><TabsTrigger value="tools">Useful tools</TabsTrigger><TabsTrigger value="design">Design play</TabsTrigger></TabsList><span className="work-caption">Made to be tried, not just looked at.</span></div>{["all", "tools", "design"].map(value => <TabsContent key={value} value={value}><div className="projects-grid">{visible.map(study => <ProjectCard study={study} key={study.id} index={caseStudies.indexOf(study)} />)}</div></TabsContent>)}</Tabs>
+    <p className="work-footnote"><span />These are working interface studies created for this portfolio.</p>
+    <a href={routeHref("about")} className="page-next-link">Curious about the process? <ArrowRight size={17} /></a>
+  </section>;
+}
+
+function AboutPage() {
+  const timelineData = process.map(step => ({ title: step.kicker.split(" / ")[1], content: <div className="process-entry"><span className="process-kicker">{step.kicker}</span><h3>{step.title}</h3><p>{step.description}</p><div className="deliverables">{step.deliverables.map(item => <span key={item}><Check size={13} />{item}</span>)}</div></div> }));
+  return <section className="content-page about-page" aria-label="About"><PageIntro eyebrow="THE PERSON BEHIND THE PIXELS" title="Curious by default." description="I like making useful things feel a little more thoughtful. And thoughtful things feel a little more human." />
+    <div className="about-layout"><div className="about-story"><h2>Somewhere between<br />“what if?” and “it works.”</h2><p>I’m drawn to the space where design becomes something you can actually use. A clear layout gets my attention. A clever little interaction keeps it.</p><p>I enjoy taking an idea apart, finding the useful bit, and building it back up with care. Sometimes that means a whole page. Sometimes it’s just making one button feel right.</p><p>Right now, this space is a place to experiment with interfaces, share the thinking behind them, and keep getting better at the details.</p></div><aside className="about-note"><Mark /><span>A NOTE TO SELF</span><h3>Keep it useful.<br />Leave a little<br /><em>personality.</em></h3><p>The best details help people feel at home.</p></aside></div>
+    <div className="skills-heading"><h2>What I bring to the table.</h2><p>Tap a card for the slightly longer answer.</p></div>
+    <Accordion type="single" collapsible className="skill-accordion">{skills.map((skill, index) => <AccordionItem value={"skill-" + index} key={skill.title} className="skill-item"><AccordionTrigger><span className="skill-symbol"><skill.icon size={23} /></span><span className="skill-name"><strong>{skill.title}</strong><span>{skill.summary}</span></span></AccordionTrigger><AccordionContent><p>{skill.description}</p><div className="skill-tags">{skill.tools.map(tool => <Badge variant="secondary" key={tool}>{tool}</Badge>)}</div></AccordionContent></AccordionItem>)}</Accordion>
+    <Accordion type="single" collapsible className="about-process"><AccordionItem value="process"><AccordionTrigger><span><Lightbulb size={20} /> From first thought to final detail</span></AccordionTrigger><AccordionContent><div className="process-section"><p className="process-intro">Nothing fancy. Just a little structure, plenty of trying things, and a useful question at every step.</p><Timeline className="portfolio-timeline" data={timelineData} /></div></AccordionContent></AccordionItem></Accordion>
+    <a href={routeHref("beyond")} className="page-next-link">Take a look at the curious corner <ArrowRight size={17} /></a>
+  </section>;
+}
+
+function ContactPage() {
+  const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
+  const timeout = useRef<number | undefined>(undefined);
+  useEffect(() => () => clearTimeout(timeout.current), []);
+  const copyEmail = async () => { if (!profile.email) return; try { await navigator.clipboard.writeText(profile.email); setCopied(true); setCopyError(false); clearTimeout(timeout.current); timeout.current = window.setTimeout(() => setCopied(false), 3000); } catch { setCopyError(true); } };
+  return <section className="content-page contact-page" aria-label="Contact"><div className="contact-copy"><PageIntro eyebrow="SOMETHING ON YOUR MIND?" title="Good things start with a hello." description="A website idea, a small collaboration, or a problem you’d like to untangle. I’d love to hear the first thought." /><p>You don’t need a perfect brief. A few lines about who it’s for and what it should do are a good place to start.</p><div className="contact-links">{profile.email && <><a href={"mailto:" + profile.email}><Mail size={18} />{profile.email}<ArrowUpRight size={15} /></a><Button variant="outline" onClick={copyEmail}><Copy size={15} />{copied ? "Copied!" : "Copy email"}</Button><span role="status">{copied ? "Email copied." : copyError ? "Copy unavailable. Select the email address above." : ""}</span></>}{profile.github && <a href={profile.github} target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={16} /></a>}{profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn <ArrowUpRight size={16} /></a>}</div><a href={routeHref("work")} className="back-link">See what I’m making <ArrowRight size={16} /></a></div>
+      <aside className="contact-paper"><span className="paper-hello" aria-hidden="true">hello<span>✳</span></span><span className="eyebrow">EVERY IDEA STARTS SOMEWHERE</span><h2>What if we<br />made something<br /><em>good together?</em></h2><p>Start with the messy version.<br />The shape can come later.</p>{profile.email ? <Button asChild><a href={"mailto:" + profile.email}>Say hello <ArrowUpRight size={17} /></a></Button> : <BriefDialog />}{!profile.email && <p className="contact-smallprint">Jot down a brief and copy it to share.<br />Saved only in this browser. No message is sent.</p>}</aside>
+    </section>;
+}
+
+function CurrentPage({ route }: { route: PortfolioRoute }) {
+  if (route === "home") return <HomePage />;
+  if (route === "work") return <WorkPage />;
+  if (route === "about") return <AboutPage />;
+  if (route === "beyond") return <section className="content-page beyond-page" aria-label="Beyond work"><PageIntro eyebrow="BEYOND THE TO-DO LIST" title="A little room for curiosity." description="A small collection of colors, ideas, and things worth thinking about. Pick something up. See where it takes you." /><BeyondBoard /></section>;
+  if (route === "contact") return <ContactPage />;
+  return <section className="content-page not-found"><PageIntro eyebrow="A SMALL WRONG TURN" title="Nothing tucked away here." description="That page doesn’t exist. There are a few good places to start, though." /><Button asChild><a href={routeHref("home")}>Back home <ArrowRight size={17} /></a></Button></section>;
 }
 
 export default function App() {
-  const noteFocus = useDialogOpenerFocus();
-  const [dark,setDark]=useState(()=>{try{return localStorage.getItem("portfolio-theme")==="dark";}catch{return false;}});
-  const [active,setActive]=useState("home");
-  const [workFilter,setWorkFilter]=useState("all");
-  useEffect(()=>{document.documentElement.classList.toggle("dark",dark);document.documentElement.dataset.theme=dark?"dark":"light";document.querySelector('meta[name="theme-color"]')?.setAttribute("content",dark?"#16181e":"#fafaf8");try{localStorage.setItem("portfolio-theme",dark?"dark":"light");}catch{}},[dark]);
-  useEffect(()=>{
-    const ids=["home","work","about","strengths","approach","notes","questions","contact"];
-    let raf=0;
-    const update=()=>{let current="home";ids.forEach(id=>{if((document.getElementById(id)?.getBoundingClientRect().top??9999)<=145)current=id;});setActive(current);raf=0;};
-    const onScroll=()=>{if(!raf)raf=requestAnimationFrame(update);};
-    window.addEventListener("scroll",onScroll,{passive:true});update();
-    return()=>{window.removeEventListener("scroll",onScroll);cancelAnimationFrame(raf);};
-  },[]);
-  const processData=process.map((step,index)=>({title:step.kicker.split(" / ")[1],content:<div className={"process-entry step-"+index}><span className="process-kicker">{step.kicker}</span><h3>{step.title}</h3><p>{step.description}</p><div className="deliverables">{step.deliverables.map(item=><span key={item}><Check size={13}/>{item}</span>)}</div><div className="process-sketch" aria-hidden="true">{index===0?<><div className="sketch-note">Who’s it for?</div><ArrowRight/><div className="sketch-note filled">What do they need?</div></>:index===1?<><div className="wireframe"><i/><span/><span/><div><b/><b/><b/></div></div><div className="wireframe narrow"><i/><span/><div><b/></div></div></>:index===2?<><div className="code-snippet"><span>function</span> makeItUseful() &#123;<br/>&nbsp; return <strong>idea + care;</strong><br/>&#125;</div><Code2 size={35}/></>:<><div className="review-chip"><Check/> Keyboard</div><div className="review-chip"><Check/> Small screens</div><div className="review-chip"><Check/> Real content</div></>}</div></div>}));
-  const visibleStudies=caseStudies.filter(study=>workFilter==="all"||(workFilter==="design"?study.id==="palette":study.id!=="palette"));
-  return <MotionConfig reducedMotion="user"><TooltipProvider><a className="skip-link" href="#main">Skip to content</a><div className="site-shell">
-    <header className="site-header"><a href="#home" className="brand" aria-label="Portfolio home"><Mark/><span>{profile.name||"folio"}<i>.</i></span></a><nav aria-label="Main navigation">{nav.map(([label,id])=><a key={id} href={"#"+id} className={active===id?"active":""} aria-current={active===id?"location":undefined}>{label}</a>)}</nav><div className="header-actions"><Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="theme-toggle" aria-label={dark?"Switch to light theme":"Switch to dark theme"} onClick={()=>setDark(value=>!value)}>{dark?<Sun size={17}/>:<Moon size={17}/>}</Button></TooltipTrigger><TooltipContent>{dark?"Light mode":"Dark mode"}</TooltipContent></Tooltip><Button asChild variant="outline" className="nav-contact"><a href="#contact">Let’s talk <ArrowUpRight size={14}/></a></Button></div></header>
-    <main id="main">
-      <section className="hero" id="home" aria-labelledby="hero-heading"><div className="hero-grid" aria-hidden="true"/><Badge variant="outline" className="hero-badge"><span/> DESIGN MINDED. DETAIL DRIVEN.</Badge><h1 id="hero-heading">Thoughtful design.<br/><em>Made to <span>work.</span></em></h1><TextGenerateEffect className="hero-copy" textClassName="hero-copy-text" words="I turn ideas into clear, useful interfaces — with purposeful interaction, thoughtful details, and a strong sense of personality." duration={0.35} staggerDelay={0.025}/><div className="hero-actions"><Button asChild><a href="#work">Explore my work <ArrowDown size={16}/></a></Button><Button asChild variant="ghost"><a href="#about">Meet the person behind it <ArrowUpRight size={16}/></a></Button></div><div className="hero-foot"><span><Code2 size={15}/> Built in the browser</span><span><PenTool size={15}/> Designed for people</span><a href="#work">There’s more below <ArrowDown size={14}/></a></div><span className="hero-spark spark-left" aria-hidden="true">✳</span><span className="hero-spark spark-right" aria-hidden="true">✦</span></section>
-
-      <section className="page-section work-section" id="work"><SectionHeading label="SELECTED WORK & EXPLORATIONS" title="Ideas you can actually try." description="Small tools. Real interactions. A closer look at how I think through an interface." index="01"/><Tabs value={workFilter} onValueChange={setWorkFilter} className="work-tabs"><div className="work-toolbar"><TabsList aria-label="Filter projects"><TabsTrigger value="all">All work <span>03</span></TabsTrigger><TabsTrigger value="productivity">Productivity</TabsTrigger><TabsTrigger value="design">Design tools</TabsTrigger></TabsList><span className="work-caption">Open a study. Play with the details.</span></div>{["all","productivity","design"].map(filter=><TabsContent value={filter} key={filter}><div className="projects-grid">{visibleStudies.map(study=><ProjectCard key={study.id} study={study} index={caseStudies.findIndex(item=>item.id===study.id)}/>)}</div></TabsContent>)}</Tabs><div className="section-postscript"><span className="small-plus">+</span><p>These are working interface studies, built for this portfolio. Each includes a live demo and the thinking behind it.</p></div></section>
-
-      <section className="page-section about-section" id="about"><SectionHeading label="A BIT ABOUT ME" title="Somewhere between design & code." description="I’m drawn to the point where an idea starts to feel like a product." index="02"/><BentoGrid className="about-bento">
-        <BentoGridItem className="bento-story" header={<div className="story-art"><span>the way it looks</span><div><span>design</span><i><Sparkles size={22}/></i><span>code</span></div><span>the way it works</span></div>} title="The two should feel like one." description={<p>I like building things that feel considered from the first screen to the last click. A good interface has a clear purpose, gives useful feedback, and leaves room for a little personality.</p>} icon={<PenTool size={19}/>}/>
-        <BentoGridItem className="bento-detail" header={<div className="detail-art"><span className="detail-note">not just how it looks.</span><strong>How does<br/>it <em>feel?</em></strong><MousePointer2 className="detail-pointer" size={28} fill="currentColor"/></div>} title="Small details. Lasting impressions." description={<p>The quiet animation. The helpful empty state. The button that does exactly what you expect. Those are the moments I want to get right.</p>} icon={<MousePointer2 size={19}/>}/>
-        <BentoGridItem className="bento-tools" header={<div className="stack-art">{[["R","React"],["TS","TypeScript"],["~","Tailwind"],["ϟ","Vite"]].map(([mark,label])=><div key={label}><span>{mark}</span><small>{label}</small></div>)}</div>} title="A practical set of building blocks." description="The tools behind these studies: React, TypeScript, Tailwind CSS, and Vite. Paired with reusable components and plenty of iteration." icon={<Code2 size={19}/>}/>
-        <BentoGridItem className="bento-principles" header={<div className="principle-art"><div><Check size={15}/><span>Make the next step clear.</span></div><div><Check size={15}/><span>Give every action a response.</span></div><div><Check size={15}/><span>Leave things better than you found them.</span></div></div>} title="Simple takes work." description="I’d rather refine a few useful ideas than add another layer of noise. The goal is an experience that feels easy, even when the work behind it isn’t." icon={<Lightbulb size={19}/>}/>
-      </BentoGrid></section>
-
-      <section className="page-section strengths-section" id="strengths"><SectionHeading label="WHAT I FOCUS ON" title="From a first idea to a usable interface." index="03"/><div className="strengths-grid">{strengths.map((strength,index)=><article className="strength-card" key={strength.title}><span className="strength-icon">{index===0?<Layers3/>:index===1?<Workflow/>:<Sparkles/>}</span><span className="strength-number">0{index+1}</span><h3>{strength.title}</h3><p>{strength.description}</p><ul>{strength.items.map(item=><li key={item}><span/>{item}</li>)}</ul></article>)}</div></section>
-
-      <section className="page-section approach-section" id="approach"><SectionHeading label="HOW I APPROACH THE WORK" title="Good outcomes start before the code." description="A practical process, with room to explore and enough structure to keep moving." index="04"/><Timeline className="portfolio-timeline" data={processData}/></section>
-
-      <section className="page-section notes-section" id="notes"><SectionHeading label="NOTES FROM THE PROCESS" title="Things worth thinking about." description="Short reads on the choices that make an interface clearer, calmer, and easier to use." index="05"/><div className="notes-grid">{notes.map((note,index)=><Dialog key={note.title}><article className="note-card"><DialogTrigger asChild><button onClick={noteFocus.capture} className={"note-art note-art-"+index} aria-label={"Read "+note.title}>{index===0?<div className="type-art"><span>Aa</span><p>Less guessing.<br/>More understanding.</p><i/></div>:index===1?<div className="motion-art"><span/><span/><span/><ArrowRight size={30}/></div>:<div className="responsive-art"><div><i/><i/><i/></div><div><i/><i/><i/></div><div><i/><i/><i/></div></div>}</button></DialogTrigger><div className="note-meta"><span>{note.category}</span><span>{note.readTime}</span></div><DialogTrigger asChild><button onClick={noteFocus.capture} className="note-title"><h3>{note.title}</h3><ArrowUpRight size={17}/></button></DialogTrigger><p>{note.paragraphs[0].split(". ")[0]}.</p><DialogTrigger asChild><Button onClick={noteFocus.capture} variant="ghost" className="read-note">Read the note <ArrowRight size={14}/></Button></DialogTrigger></article><DialogContent className="article-dialog" onCloseAutoFocus={noteFocus.restore}><DialogHeader><div className="eyebrow">{note.category} / {note.readTime}</div><DialogTitle>{note.title}</DialogTitle><DialogDescription>A note on the decisions behind useful interfaces.</DialogDescription></DialogHeader><div className="article-body">{note.paragraphs.map(paragraph=><p key={paragraph}>{paragraph}</p>)}</div><div className="article-footer"><Mark/> A considered detail makes a difference.</div></DialogContent></Dialog>)}</div></section>
-
-      <section className="page-section faq-section" id="questions"><div className="faq-heading"><p className="eyebrow"><span/>BEFORE YOU ASK</p><h2>A few useful answers.</h2><p>The work, the process, and what comes next.</p><div className="faq-doodle" aria-hidden="true">?</div></div><Accordion type="single" collapsible className="faq-accordion">{faqs.map((faq,index)=><AccordionItem value={"question-"+index} key={faq.question}><AccordionTrigger>{faq.question}</AccordionTrigger><AccordionContent>{faq.answer}</AccordionContent></AccordionItem>)}</Accordion></section>
-
-      <section className="contact-section" id="contact"><div className="contact-grid" aria-hidden="true"/><Mark className="contact-mark"/><p className="eyebrow">LET’S MAKE SOMETHING THAT MATTERS</p><h2>Have a good idea?<br/><em>Let’s give it a shape.</em></h2><p>A useful tool. A thoughtful website. A detail that makes the whole experience better.<br/>I’d love to hear what you’re thinking about.</p>{profile.email?<Button asChild className="contact-button"><a href={"mailto:"+profile.email}>Say hello <ArrowUpRight size={17}/></a></Button>:<BriefDialog/>}<span className="contact-caption">{profile.email?profile.email:"Start with the problem. We can work out the possibilities."}</span><div className="social-links">{profile.github&&<a href={profile.github} target="_blank" rel="noreferrer"><Code2 size={16}/> GitHub</a>}{profile.linkedin&&<a href={profile.linkedin} target="_blank" rel="noreferrer"><ArrowUpRight size={16}/> LinkedIn</a>}</div></section>
-    </main><footer><div className="footer-top"><a href="#home" className="brand"><Mark/><span>{profile.name||"folio"}<i>.</i></span></a><p>Thoughtful interfaces.<br/>A little personality. A lot of care.</p><div><a href="#work">Selected work</a><a href="#about">About</a><a href="#approach">Approach</a><a href="#notes">Notes</a></div><a className="back-top" href="#home">Back to the top <ArrowUpRight size={16}/></a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} · Personal portfolio</span><span>Made to be explored, one detail at a time.</span></div></footer>
+  const route = usePortfolioRoute();
+  const reduceMotion = useReducedMotion();
+  const [dark, setDark] = useState(() => { try { return localStorage.getItem("portfolio-theme") === "dark"; } catch { return false; } });
+  const firstPage = useRef(true);
+  useEffect(() => { document.documentElement.classList.toggle("dark", dark); document.documentElement.dataset.theme = dark ? "dark" : "light"; document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#25231f" : "#faf7f2"); try { localStorage.setItem("portfolio-theme", dark ? "dark" : "light"); } catch {} }, [dark]);
+  useLayoutEffect(() => {
+    const label = navigation.find(item => item.id === route)?.label || "Page not found";
+    document.title = `${label} — ${profile.name || "Folio"}`;
+    window.scrollTo({ top: 0, behavior: "instant" });
+    if (!firstPage.current) document.querySelector<HTMLElement>("[data-page-heading]")?.focus({ preventScroll: true });
+    firstPage.current = false;
+  }, [route]);
+  return <MotionConfig reducedMotion="user"><TooltipProvider><a className="skip-link" href="#main" onClick={event => { event.preventDefault(); const main = document.getElementById("main"); main?.focus({ preventScroll: true }); main?.scrollIntoView({ behavior: "instant" }); }}>Skip to content</a><div className="site-shell">
+    <header className="site-header"><a href={routeHref("home")} className="brand" aria-label="Portfolio home"><Mark /><span>{profile.name || "folio"}<i>.</i></span></a><nav aria-label="Main navigation">{navigation.map(item => <a href={routeHref(item.id)} key={item.id} className={route === item.id ? "active" : ""} aria-current={route === item.id ? "page" : undefined}>{item.label}</a>)}</nav><div className="header-actions"><Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="theme-toggle" aria-label={dark ? "Switch to light theme" : "Switch to dark theme"} onClick={() => setDark(value => !value)}>{dark ? <Sun size={18} /> : <Moon size={18} />}</Button></TooltipTrigger><TooltipContent>{dark ? "Light mode" : "Dark mode"}</TooltipContent></Tooltip></div></header>
+    <main id="main" tabIndex={-1}><motion.div key={route} className="route-page" initial={{ opacity: reduceMotion ? 1 : 0, y: reduceMotion ? 0 : 9 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.24, ease: "easeOut" }}><CurrentPage route={route} /></motion.div></main>
+    <footer className="route-footer"><a href={routeHref("home")} className="brand"><Mark /><span>{profile.name || "folio"}<i>.</i></span></a><p>A little curiosity goes a long way.</p><div className="footer-page-links"><a href={routeHref("work")}>Work</a><a href={routeHref("about")}>About</a><a href={routeHref("contact")}>Contact <ArrowUpRight size={13} /></a></div><span>© {new Date().getFullYear()}</span></footer>
   </div></TooltipProvider></MotionConfig>;
 }
-

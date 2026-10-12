@@ -1,51 +1,53 @@
-# Portfolio content and implementation plan
+# Portfolio implementation plan
 
-The current direction is a complete, modern editorial portfolio: light paper surfaces, blue accents, a clear reading order, useful small interactions, and an optional dark theme. The personal feel of the supplied heheboi.in reference informed the direction; the layout details, illustrations, studies, and editorial content belong to this implementation.
+## Current direction
 
-## Eight-section content structure
+The portfolio is organized as five separate pages with native hash navigation. A compact illustrated Home introduces the site, then visitors choose Work, About, Beyond work, or Contact. Warm paper, coral details, muted mint/lilac/yellow accents, original paper illustrations, and restrained motion follow the supplied PDF's editorial direction. A coordinated dark theme is available.
 
-| Section | Implemented content and behavior |
+The PDF is an art and structure reference. Its personal examples do not establish the owner's identity, work history, hobbies, projects, or achievements.
+
+## Implemented content structure
+
+| Page | Content and behavior |
 | --- | --- |
-| Home | Design-led introduction, animated supporting text, and links into Work and About |
-| Work | Three working studies; All work/Productivity/Design tools filters; demo and case-study tabs |
-| About | Four illustrated bento cards connecting design, code, tools, and interface principles |
-| Strengths | Three areas of focus with concrete supporting practices |
-| Approach | Understand → Explore → Make → Refine, shown through a scroll-responsive process timeline |
-| Notes | Three complete articles on hierarchy, purposeful motion, and responsive content |
-| Questions | Four FAQ answers using a single-open, collapsible accordion |
-| Contact | A browser-local brief with a copy action until a real email address is supplied |
+| Home (`#/`) | Brief introduction, animated supporting text, original illustration, and four destination cards |
+| Work (`#/work`) | Taskboard, Focus timer, and Palette lab; All work/Useful tools/Design play filters; demo and study tabs |
+| About (`#/about`) | Draft personal introduction, three skill accordions, and an expandable Understand/Explore/Make/Refine timeline |
+| Beyond work (`#/beyond`) | Six illustrated cards: color, type/space, drawing, and three full editorial articles; detail dialogs and local save hearts |
+| Contact (`#/contact`) | Local brief with a copy action; real email and social links appear only after they are supplied |
 
-## Working studies
+Unknown routes show a useful not-found page. Direct hash URLs, refreshes, and browser Back/Forward retain page navigation. Legacy section links map into the new pages: `#approach` to About, `#notes` and `#/hobbies` to Beyond work, `#questions` to Contact, and matching Home/Work/About/Contact fragments to their pages. Navigation updates the title, starts the page at the top, and focuses the heading. The skip link focuses main content while retaining the current route.
 
-- **Taskboard:** add tasks, move them through To do/In progress/Done, delete them, or reset the board. Tasks persist locally, and keyboard focus follows moved or deleted cards.
-- **Focus timer:** choose a session duration, start or pause it, and reset it. A saved deadline allows elapsed time to be reflected when the preview reopens.
-- **Palette lab:** explore five curated color sets, see a contextual preview, and copy a hex value.
+## Working studies and board
 
-Each study has its own challenge, approach, and outcome copy. These are interface studies made for this site; their descriptions make no claims about clients, commercial deployment, or measured business results.
+Taskboard supports adding, moving, deleting, and resetting tasks, with browser persistence and focus handling after changes. Focus timer supports four durations, pause/resume/reset, and a persisted deadline so reopening reflects elapsed time. Palette lab cycles five curated sets and copies hex values.
 
-## Foundation and interaction
+Each study has challenge, approach, and result copy. These are tools made for this portfolio, with no claims of commercial deployment or business metrics.
 
-React and TypeScript run through Vite, with Tailwind CSS v4 and portfolio-specific CSS. The app uses actual official-source Aceternity BentoGrid, Timeline, and TextGenerateEffect components, plus shadcn Button, Badge, Tabs, Dialog, Accordion, and Tooltip. The installed component headers preserve their source URLs.
+The Beyond board includes original CSS/SVG artwork and complete readable details. Each of its six cards opens a dialog and has a separate save/unsave heart. Saved card IDs and a visible saved count persist locally; no account or remote collection is involved. The three articles discuss clear interfaces, purposeful motion, and responsive content. They do not establish personal biography.
 
-The Aceternity timeline describes a design process, not an invented career history. Its stock biography is removed. Reduced-motion preferences are respected in the text animation, timeline, Motion configuration, and CSS effects. The layout includes a skip link, active navigation, accessible control names, responsive dialogs, and focus restoration to the control that opened a dialog.
+## Foundation and accessibility
 
-## Content that still needs the owner
+React and TypeScript run through Vite, with Tailwind CSS v4 and portfolio-specific CSS. The current pages use official-source Aceternity Timeline and TextGenerateEffect, plus shadcn Button, Badge, Tabs, Dialog, Accordion, and Tooltip. Aceternity BentoGrid remains installed for future use but is not rendered in this layout. Component headers preserve source URLs.
 
-The implementation is complete as a working portfolio draft. Personalization remains a content step:
+The timeline's stock biography was removed. Reduced-motion preferences are handled by Motion configuration, the text effect, timeline, and CSS. The interface includes a skip link, active-page navigation, named controls, keyboard dialogs, and focus restoration. Route transitions reset page scroll; they do not promise restoration of each page's previous scroll position.
 
-1. Supply the real name, email, GitHub, and LinkedIn fields in `src/portfolio-content.ts`; they currently remain `null`.
-2. Review and personalize the first-person introduction, About copy, strengths, process, and notes.
-3. Add the user's own photograph when supplied, with an appropriate crop and alt text.
-4. Add verified personal projects, role descriptions, links, and outcomes when available. Keep the included tools labeled as studies.
+## Personalization still needed
 
-There are no fabricated employers, dates of employment, credentials, testimonials, clients, or performance metrics. Empty contact fields do not generate fake destinations.
+1. Supply the real name, email, GitHub, and LinkedIn in `src/portfolio-content.ts`; all four remain `null`.
+2. Review the first-person introduction, About copy, skill descriptions, process, and editorial articles.
+3. Add the owner's photograph when supplied, with a suitable crop and alt text.
+4. Add verified personal projects, links, roles, and outcomes. Keep the included tools identified as studies.
+5. Replace or extend the Beyond board with confirmed personal interests when available.
+
+No employers, employment dates, credentials, clients, testimonials, or results are fabricated. Unused older FAQ/strength exports remain in the content module; the current site has five routes rather than the earlier eight-section structure.
 
 ## Data and contact scope
 
-Theme, Taskboard state, Focus timer state, and the contact draft are stored only in the browser's local storage. Palette selection is temporary. Copy buttons use the clipboard after a user action. The brief explicitly says it does not send a message; there is no submission endpoint or backend. Once a real email is supplied, the contact button opens the visitor's email client through `mailto:`.
+Theme, tasks, timer state, saved board IDs, and the brief use browser local storage. Palette selection is temporary. Copy actions use the clipboard. The brief explicitly says that no message is sent; there is no submission endpoint, backend, or analytics integration. With a supplied email, the contact action opens the visitor's email client through `mailto:`.
 
-Google Fonts provides the two typefaces through external font requests. The local draft and study state are not transmitted by the application. The README records the exact storage keys and how to clear them.
+Local values are not encrypted or synchronized. Clearing site data removes them. Google Fonts makes external font requests; the application does not transmit local task or draft content. README lists the exact storage keys.
 
 ## Validation scope
 
-The project exposes `npm run typecheck` and `npm run build`. Functional review should cover all study controls, local persistence, timer reopening, filters and dialog tabs, article dialogs, FAQ behavior, theme persistence, reduced motion, keyboard focus, clipboard feedback, and layouts at phone and desktop widths. Publishing and personal content approval are separate from the local implementation.
+Use `npm run typecheck` and `npm run build` for implementation changes. Functional review covers all five direct routes, unknown routes, legacy aliases, Back/Forward, skip-link focus, heading/title updates, mobile navigation, dialogs, study controls and persistence, timer reopening, board hearts and articles, filters, theme, reduced motion, clipboard feedback, and contact-draft behavior. Publishing and verified personal content are separate from this local draft.
