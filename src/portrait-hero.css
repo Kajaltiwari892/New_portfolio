@@ -1,7 +1,7 @@
 @font-face { font-family: Sansation; src: url("/assets/fonts/sansation-400.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
 @font-face { font-family: Sansation; src: url("/assets/fonts/sansation-700.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
 
-/* The header, stage, and logo strip share one viewport-height budget. */
+/* The portrait fills the first screen; the technology strip appears on scroll. */
 .site-shell[data-page="home"] { --hero-header: clamp(62px, 10.5svh, 88px); --hero-tools: clamp(58px, 9svh, 76px); width: 100%; max-width: none; margin: 0; background: var(--paper); }
 .site-header .brand { font-family: Manrope, sans-serif; font-size: 24px; font-weight: 750; letter-spacing: -1px; }
 .site-header .brand > svg { color: currentColor; width: 25px; }
@@ -17,7 +17,7 @@
 .nav-glide { position: absolute; z-index: 0; top: 0; left: 0; border-radius: 999px; background: #faf7efbd; box-shadow: 0 2px 6px #372f2710; pointer-events: none; }
 .site-shell[data-page="home"] .home-page { padding: 0 0 40px; }
 .portrait-hero { color: var(--ink); background: linear-gradient(180deg, #afa9a3 0%, #aaa49e 52%, #afa9a3 100%); }
-.portrait-stage { position: relative; isolation: isolate; overflow: hidden; height: calc(100svh - var(--hero-header) - var(--hero-tools)); min-height: 0; }
+.portrait-stage { position: relative; isolation: isolate; overflow: hidden; height: calc(100svh - var(--hero-header)); min-height: 0; }
 .portrait-stage::before, .portrait-stage::after { content: ""; position: absolute; z-index: 0; top: -12%; bottom: -12%; width: 43%; pointer-events: none; filter: blur(32px); background: linear-gradient(90deg, #f5f0e7d9, #e9e0d391 32%, #e4d8c945 61%, transparent 100%); }
 .portrait-stage::before { left: -6%; }
 .portrait-stage::after { right: -6%; transform: scaleX(-1); }
@@ -29,9 +29,9 @@
 .portrait-role > :last-child { grid-column: 3; justify-self: start; }
 .portrait-image-wrap { position: absolute; z-index: 2; inset: auto 0 0; height: 100%; pointer-events: none; }
 .portrait-reveal { position: absolute; inset: 0; }
-.portrait-image { position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); height: 106%; width: auto; max-width: none; object-fit: contain; }
+.portrait-image { position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); height: 108%; width: auto; max-width: none; object-fit: contain; }
 .portrait-intro { position: absolute; z-index: 3; left: 5.2%; bottom: 7%; width: 26%; max-width: 355px; }
-.portrait-kicker { display: inline-flex; align-items: center; gap: 7px; font-size: 8px; font-weight: 650; letter-spacing: 1.3px; white-space: nowrap; }
+.portrait-kicker { display: inline-flex; align-items: center; gap: 9px; font-size: clamp(13px, 1.15vw, 18px); font-weight: 750; letter-spacing: 1px; white-space: nowrap; }
 .portrait-kicker > span { width: 5px; height: 5px; border-radius: 50%; background: #363c2f; }
 .portrait-intro h2 { margin-top: 14px; font: 750 clamp(22px, min(2.1vw, 3.85svh), 35px)/1.17 Manrope, sans-serif; letter-spacing: -.9px; text-wrap: balance; }
 .portrait-intro h2 > span { color: #705442; }
@@ -70,7 +70,7 @@
   .portrait-intro h2 { font-size: clamp(21px, 2.6vw, 28px); }
   .portrait-aside { width: 19%; }
   .portrait-image { height: min(106%, 76vw); }
-  .portrait-kicker { font-size: 7px; letter-spacing: .8px; }
+  .portrait-kicker { font-size: 13px; letter-spacing: .8px; }
   .portrait-aside > p { font-size: 15px; }
 }
 @media (max-height: 650px) and (min-width: 801px) {
@@ -78,7 +78,7 @@
   .portrait-intro h2 { font-size: 22px; margin-top: 9px; }
   .portrait-intro > p { font-size: 12px; margin-top: 9px; line-height: 1.5; }
   .portrait-work-link { margin-top: 12px; padding: 10px 17px; }
-  .portrait-kicker { font-size: 7px; }
+  .portrait-kicker { font-size: 12px; }
   .portrait-aside > svg { width: 26px; height: 26px; margin-bottom: 8px; }
   .portrait-aside a { margin-top: 10px; }
 }
@@ -100,7 +100,7 @@
   .portrait-image-wrap { position: relative; inset: auto; height: 100%; width: 100%; min-height: 0; }
   .portrait-image { height: 118%; left: 50%; bottom: -18px; }
   .portrait-intro { position: relative; left: auto; bottom: auto; width: 100%; max-width: none; padding: 16px 7% 18px; background: #ece5dc; border-top: 1px solid #d6cec3; }
-  .portrait-kicker { display: none; }
+  .portrait-kicker { display: inline-flex; font-size: 12px; margin-bottom: 8px; }
   .portrait-intro h2 { font-size: 25px; line-height: 1.08; margin: 0; letter-spacing: -.85px; text-wrap: initial; }
   .portrait-intro h2 br { display: none; }
   .portrait-intro h2 > span::before { content: " "; }

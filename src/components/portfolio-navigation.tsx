@@ -33,7 +33,7 @@ export function PortfolioNavigation({ items, route }: { items: NavigationItem[];
     <motion.span className="nav-glide" aria-hidden="true" initial={false}
       animate={highlight ? { ...highlight, opacity: 1 } : { opacity: 0 }}
       transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 32, mass: 0.65, opacity: { duration: 0.12 } }} />
-    {items.map(item => <a href={routeHref(item.id)} key={item.id} data-nav-id={item.id} onPointerEnter={() => setHovered(item.id)} onFocus={() => setFocused(item.id)} aria-current={route === item.id ? "page" : undefined}>
+    {items.map(item => <a href={routeHref(item.id)} key={item.id} data-nav-id={item.id} onPointerEnter={() => setHovered(item.id)} onFocus={() => setFocused(item.id)} aria-current={route === item.id ? "location" : undefined}>
       <span className="nav-label">{item.label}</span>
     </a>)}
   </nav>;

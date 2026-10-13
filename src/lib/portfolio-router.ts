@@ -11,11 +11,11 @@ export type PortfolioRoute =
 type NavigableRoute = Exclude<PortfolioRoute, "not-found">;
 
 const routePaths: Record<NavigableRoute, string> = {
-  home: "#/",
-  work: "#/work",
-  about: "#/about",
-  beyond: "#/beyond",
-  contact: "#/contact",
+  home: "#home",
+  work: "#work",
+  about: "#about",
+  beyond: "#beyond",
+  contact: "#contact",
 };
 
 const hashRoutes = new Map<string, PortfolioRoute>([
@@ -30,6 +30,7 @@ const hashRoutes = new Map<string, PortfolioRoute>([
   ["#home", "home"],
   ["#work", "work"],
   ["#about", "about"],
+  ["#beyond", "beyond"],
   ["#approach", "about"],
   ["#notes", "beyond"],
   ["#questions", "contact"],
