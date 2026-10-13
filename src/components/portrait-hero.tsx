@@ -19,7 +19,19 @@ export function PortraitHero() {
   const [portraitReady, setPortraitReady] = useState(false);
   const portraitRef = useRef<HTMLImageElement>(null);
   useEffect(() => {
-    if (portraitRef.current?.complete) setPortraitReady(true);
+    const portrait = portraitRef.current;
+    if (!portrait) return;
+    let cancelled = false;
+    const reveal = async () => {
+      try { await portrait.decode(); } catch { return; }
+      if (!cancelled) setPortraitReady(true);
+    };
+    if (portrait.complete && portrait.naturalWidth > 0) void reveal();
+    else portrait.addEventListener("load", reveal, { once: true });
+    return () => {
+      cancelled = true;
+      portrait.removeEventListener("load", reveal);
+    };
   }, []);
   const enter = (delay = 0) => ({
     initial: { opacity: reduceMotion ? 1 : 0, y: reduceMotion ? 0 : 18 },
@@ -37,10 +49,10 @@ export function PortraitHero() {
       </motion.p>
       <div className="portrait-image-wrap">
         <motion.div className="portrait-reveal"
-          initial={{ opacity: reduceMotion ? 1 : 0 }}
-          animate={{ opacity: portraitReady || reduceMotion ? 1 : 0 }}
-          transition={{ duration: reduceMotion ? 0 : 0.8, ease: "easeOut" }}>
-          <img ref={portraitRef} className="portrait-image" src="/assets/kajal-portrait.png" alt="Kajal Tiwari in a white blazer" width="1122" height="1402" fetchPriority="high" onLoad={() => setPortraitReady(true)} />
+          initial={{ y: reduceMotion ? 0 : "45%", opacity: reduceMotion ? 1 : 0 }}
+          animate={{ y: portraitReady || reduceMotion ? 0 : "45%", opacity: portraitReady || reduceMotion ? 1 : 0 }}
+          transition={{ duration: reduceMotion ? 0 : 1.1, ease: [0.22, 1, 0.36, 1], opacity: { duration: reduceMotion ? 0 : 0.25 } }}>
+          <img ref={portraitRef} className="portrait-image" src="/assets/kajal-portrait.png" alt="Kajal Tiwari in a white blazer" width="1122" height="1402" fetchPriority="high" />
         </motion.div>
       </div>
       <motion.div className="portrait-intro" {...enter(0.35)}>

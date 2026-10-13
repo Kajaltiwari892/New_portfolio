@@ -4,9 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#afa9a3" />
+    <style>
+      /* Paint the hero backdrop before the stylesheet and React arrive. */
+      html:not([data-portfolio-ready]), html:not([data-portfolio-ready]) body { margin: 0; background: #afa9a3; }
+      #app:empty { min-height: 100svh; background: linear-gradient(90deg, #d8d1c7, #c5beb5 14%, #afa9a3 37%, #afa9a3 63%, #c5beb5 86%, #d8d1c7); }
+    </style>
     <meta name="description" content="Kajal Tiwari — full-stack developer building expressive web experiences and AI tools. Code, canvas, and an endlessly curious mind." />
     <title>Kajal Tiwari — Full-stack developer</title>
     <link rel="preload" href="/assets/fonts/sansation-700.ttf" as="font" type="font/ttf" crossorigin />
+    <link rel="preload" href="/assets/kajal-portrait.png" as="image" fetchpriority="high" />
     <link rel="icon" href="/favicon.svg" />
   </head>
   <body id="top">
