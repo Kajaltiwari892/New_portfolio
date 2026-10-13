@@ -1,13 +1,13 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { MotionConfig, motion, useReducedMotion } from "motion/react";
-import { ArrowRight, ArrowUpRight, Check, Code2, Copy, Layers3, Lightbulb, Mail, Moon, PenTool, Sparkles, Sun } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, Code2, Copy, Layers3, Lightbulb, Mail, PenTool, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Timeline } from "@/components/aceternity/timeline";
-import { TextGenerateEffect } from "@/components/aceternity/text-generate-effect";
+import { PortraitHero } from "@/components/portrait-hero";
 import { BeyondBoard } from "@/components/beyond-board";
 import { BriefDialog, Mark, ProjectCard } from "@/components/portfolio-pieces";
 import { usePortfolioRoute, routeHref, type PortfolioRoute } from "@/lib/portfolio-router";
@@ -32,13 +32,11 @@ function PageIntro({ eyebrow, title, description }: { eyebrow: string; title: st
 
 function HomePage() {
   return <section className="home-page" aria-label="Home">
-    <div className="home-intro"><div className="home-copy"><p className="eyebrow"><span />{profile.name ? `WELCOME TO ${profile.name.toUpperCase()}’S CORNER` : "A PERSONAL CORNER OF THE INTERNET"}</p>
-      <h1 tabIndex={-1} data-page-heading>A little design.<br />A little code.<br /><em>A lot of curiosity.</em></h1>
-      <TextGenerateEffect className="home-description" textClassName="home-description-text" words="I like turning a what-if into something you can click, use, and enjoy. This is a small collection of things I’m making and ideas I’m exploring." duration={0.3} staggerDelay={0.018} />
-      <div className="hero-actions"><Button asChild><a href={routeHref("work")}>See my work <ArrowUpRight size={17} /></a></Button><Button asChild variant="outline"><a href={routeHref("contact")}>Say hello <ArrowRight size={16} /></a></Button></div>
-    </div><div className="home-art" aria-hidden="true"><span className="art-label">a few things in the making</span><div className="art-window"><div className="art-window-bar"><i /><i /><i /><span>little ideas / in progress</span></div><div className="art-window-body"><span>FROM A SMALL IDEA</span><strong>what if<br />we tried <em>this?</em></strong><div><i /><i /><i /></div></div></div><div className="art-note"><span>A SMALL REMINDER</span><strong>Make something<br />worth exploring.</strong><svg viewBox="0 0 120 24" fill="none"><path d="M3 17Q25 4 46 15T88 13Q101 7 117 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg></div><Mark className="art-star" /><span className="art-small-label"><span /> always a work in progress</span></div></div>
+    <PortraitHero />
+    <div className="home-directory" id="explore" tabIndex={-1} aria-label="Explore the portfolio">
     <div className="home-directory-heading"><span>PICK A PLACE TO START</span><span>A few doors. Your own pace. <ArrowRight size={13} /></span></div>
     <div className="destination-grid">{destinations.map(item => <a key={item.id} className={"destination-card destination-" + item.id} href={routeHref(item.id)}><div className="destination-top"><span className="destination-icon"><item.icon size={23} /></span><span className="destination-number">{item.number} / {item.label}</span></div><h2>{item.title}</h2><p>{item.description}</p><span className="destination-link">{item.link}<ArrowUpRight size={18} /></span></a>)}</div>
+    </div>
   </section>;
 }
 
@@ -86,9 +84,13 @@ function CurrentPage({ route }: { route: PortfolioRoute }) {
 export default function App() {
   const route = usePortfolioRoute();
   const reduceMotion = useReducedMotion();
-  const [dark, setDark] = useState(() => { try { return localStorage.getItem("portfolio-theme") === "dark"; } catch { return false; } });
   const firstPage = useRef(true);
-  useEffect(() => { document.documentElement.classList.toggle("dark", dark); document.documentElement.dataset.theme = dark ? "dark" : "light"; document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#25231f" : "#faf7f2"); try { localStorage.setItem("portfolio-theme", dark ? "dark" : "light"); } catch {} }, [dark]);
+  useEffect(() => {
+    document.documentElement.classList.remove("dark");
+    document.documentElement.dataset.theme = "light";
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", route === "home" ? "#afa9a3" : "#fcfbf8");
+    try { localStorage.setItem("portfolio-theme", "light"); } catch {}
+  }, [route]);
   useLayoutEffect(() => {
     const label = navigation.find(item => item.id === route)?.label || "Page not found";
     document.title = `${label} — ${profile.name || "Folio"}`;
@@ -96,8 +98,8 @@ export default function App() {
     if (!firstPage.current) document.querySelector<HTMLElement>("[data-page-heading]")?.focus({ preventScroll: true });
     firstPage.current = false;
   }, [route]);
-  return <MotionConfig reducedMotion="user"><TooltipProvider><a className="skip-link" href="#main" onClick={event => { event.preventDefault(); const main = document.getElementById("main"); main?.focus({ preventScroll: true }); main?.scrollIntoView({ behavior: "instant" }); }}>Skip to content</a><div className="site-shell">
-    <header className="site-header"><a href={routeHref("home")} className="brand" aria-label="Portfolio home"><Mark /><span>{profile.name || "folio"}<i>.</i></span></a><nav aria-label="Main navigation">{navigation.map(item => <a href={routeHref(item.id)} key={item.id} className={route === item.id ? "active" : ""} aria-current={route === item.id ? "page" : undefined}>{item.label}</a>)}</nav><div className="header-actions"><Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="theme-toggle" aria-label={dark ? "Switch to light theme" : "Switch to dark theme"} onClick={() => setDark(value => !value)}>{dark ? <Sun size={18} /> : <Moon size={18} />}</Button></TooltipTrigger><TooltipContent>{dark ? "Light mode" : "Dark mode"}</TooltipContent></Tooltip></div></header>
+  return <MotionConfig reducedMotion="user"><TooltipProvider><a className="skip-link" href="#main" onClick={event => { event.preventDefault(); const main = document.getElementById("main"); main?.focus({ preventScroll: true }); main?.scrollIntoView({ behavior: "instant" }); }}>Skip to content</a><div className="site-shell" data-page={route}>
+    <header className="site-header"><a href={routeHref("home")} className="brand" aria-label="Portfolio home"><Mark /><span>{profile.name || "folio"}<i>.</i></span></a><nav aria-label="Main navigation">{navigation.filter(item => route !== "home" || item.id !== "home").map(item => <a href={routeHref(item.id)} key={item.id} className={route === item.id ? "active" : ""} aria-current={route === item.id ? "page" : undefined}>{item.label}</a>)}</nav><div className="header-actions"><a className="header-contact" href={routeHref("contact")}>Let’s talk <ArrowUpRight size={16} aria-hidden="true" /></a></div></header>
     <main id="main" tabIndex={-1}><motion.div key={route} className="route-page" initial={{ opacity: reduceMotion ? 1 : 0, y: reduceMotion ? 0 : 9 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.24, ease: "easeOut" }}><CurrentPage route={route} /></motion.div></main>
     <footer className="route-footer"><a href={routeHref("home")} className="brand"><Mark /><span>{profile.name || "folio"}<i>.</i></span></a><p>A little curiosity goes a long way.</p><div className="footer-page-links"><a href={routeHref("work")}>Work</a><a href={routeHref("about")}>About</a><a href={routeHref("contact")}>Contact <ArrowUpRight size={13} /></a></div><span>© {new Date().getFullYear()}</span></footer>
   </div></TooltipProvider></MotionConfig>;

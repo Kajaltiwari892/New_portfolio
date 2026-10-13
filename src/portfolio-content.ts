@@ -1,14 +1,14 @@
-/** Draft editorial content. Personal facts remain unset until supplied. */
+/** Verified profile links; contact details remain unset until supplied. */
 export const profile: {
   name: string | null;
   email: string | null;
   github: string | null;
   linkedin: string | null;
 } = {
-  name: null,
+  name: "Kajal Tiwari",
   email: null,
-  github: null,
-  linkedin: null,
+  github: "https://github.com/Kajaltiwari892",
+  linkedin: "https://www.linkedin.com/in/kajal-tiwari-46802034a/",
 };
 
 export const strengths = [
