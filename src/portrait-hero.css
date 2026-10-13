@@ -48,7 +48,7 @@
 
 /* Two identical, equal-width groups make an uninterrupted logo loop. */
 .portrait-bottom { --strip: #f5f2eb; position: relative; z-index: 4; height: var(--hero-tools); display: flex; align-items: center; background: var(--strip); border-block: 1px solid #e5ded4; }
-.tech-marquee { overflow: hidden; width: 100%; height: 100%; display: flex; align-items: center; mask-image: linear-gradient(90deg, transparent, #000 5%, #000 94%, transparent); }
+.tech-marquee { overflow: hidden; width: 100%; height: 100%; display: flex; align-items: center; mask-image: linear-gradient(90deg, transparent, #000 16%, #000 82%, transparent); }
 .tech-track { display: flex; width: max-content; animation: technology-loop 38s linear infinite; will-change: transform; }
 .tech-group { display: flex; flex-shrink: 0; align-items: center; justify-content: space-around; gap: clamp(40px, 5vw, 96px); min-width: 100vw; width: max-content; padding: 0 clamp(20px, 2.5vw, 48px); margin: 0; list-style: none; }
 .tech-group li { display: flex; align-items: center; flex-shrink: 0; gap: 11px; font: 600 clamp(14px, 1.25vw, 21px)/1.2 Manrope, sans-serif; letter-spacing: -.45px; white-space: nowrap; }
