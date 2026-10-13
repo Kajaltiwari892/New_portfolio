@@ -89,7 +89,8 @@ export default function App() {
   useEffect(() => {
     document.documentElement.classList.remove("dark");
     document.documentElement.dataset.theme = "light";
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", "#afa9a3");
+    const themeColors: Record<PortfolioRoute, string> = { home: "#afa9a3", work: "#f0e9df", about: "#eae9e1", beyond: "#f0e7e1", contact: "#eee4d6", "not-found": "#f3efe7" };
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", themeColors[route]);
     try { localStorage.setItem("portfolio-theme", "light"); } catch {}
   }, [route]);
   useLayoutEffect(() => {
@@ -100,7 +101,7 @@ export default function App() {
     firstPage.current = false;
   }, [route]);
   return <MotionConfig reducedMotion="user"><TooltipProvider><a className="skip-link" href="#main" onClick={event => { event.preventDefault(); const main = document.getElementById("main"); main?.focus({ preventScroll: true }); main?.scrollIntoView({ behavior: "instant" }); }}>Skip to content</a><div className="site-shell" data-page={route}>
-    <header className="site-header"><a href={routeHref("home")} className="brand" aria-label="Portfolio home"><Mark /><span>{profile.name || "folio"}<i>.</i></span></a><PortfolioNavigation items={navigation.filter(item => route !== "home" || item.id !== "home")} route={route} /><div className="header-actions"><a className="header-contact" href={routeHref("contact")}>Let’s talk <ArrowUpRight size={16} aria-hidden="true" /></a></div></header>
+    <header className="site-header"><a href={routeHref("home")} className="brand" aria-label="Portfolio home"><Mark /><span>{profile.name || "folio"}<i>.</i></span></a><PortfolioNavigation items={destinations} route={route} /><div className="header-actions"><a className="header-contact" href={routeHref("contact")}>Let’s talk <ArrowUpRight size={16} aria-hidden="true" /></a></div></header>
     <main id="main" tabIndex={-1}><motion.div key={route} className="route-page" initial={{ opacity: reduceMotion ? 1 : 0, y: reduceMotion ? 0 : 9 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.24, ease: "easeOut" }}><CurrentPage route={route} /></motion.div></main>
     <footer className="route-footer"><a href={routeHref("home")} className="brand"><Mark /><span>{profile.name || "folio"}<i>.</i></span></a><p>A little curiosity goes a long way.</p><div className="footer-page-links"><a href={routeHref("work")}>Work</a><a href={routeHref("about")}>About</a><a href={routeHref("contact")}>Contact <ArrowUpRight size={13} /></a></div><span>© {new Date().getFullYear()}</span></footer>
   </div></TooltipProvider></MotionConfig>;

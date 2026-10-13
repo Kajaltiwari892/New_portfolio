@@ -1,4 +1,8 @@
-Rubik Glitch (regular)
+Sansation (regular and bold)
+Source: https://fonts.google.com/specimen/Sansation
+License: SIL Open Font License 1.1; see fonts/OFL-Sansation.txt.
+
+Rubik Glitch (previous design, no longer used)
 Source: https://fonts.google.com/specimen/Rubik+Glitch
 Font: https://fonts.gstatic.com/s/rubikglitch/v2/qkBSXv8b_srFRYQVYrDKh9ZvmA.ttf
 License: SIL Open Font License 1.1; see fonts/OFL-Rubik-Glitch.txt.
