@@ -1,0 +1,13 @@
+Rubik Glitch (regular)
+Source: https://fonts.google.com/specimen/Rubik+Glitch
+Font: https://fonts.gstatic.com/s/rubikglitch/v2/qkBSXv8b_srFRYQVYrDKh9ZvmA.ttf
+License: SIL Open Font License 1.1; see fonts/OFL-Rubik-Glitch.txt.
+
+Instrument Serif (previous design, no longer used)
+Source: https://github.com/google/fonts/tree/main/ofl/instrumentserif
+License: SIL Open Font License 1.1; see fonts/OFL-Instrument-Serif.txt.
+
+Technology brand icons: Devicon original SVG variants
+Source: https://github.com/devicons/devicon/tree/master/icons
+License: MIT; see tech/LICENSE-Devicon.txt.
+Brand names and logos remain the property of their respective owners.
