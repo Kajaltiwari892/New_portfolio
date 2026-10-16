@@ -84,7 +84,7 @@ function ContactPage() {
 }
 
 function BeyondSection() {
-  return <div className="content-page beyond-page"><PageIntro eyebrow="BEYOND THE TO-DO LIST Day 1" title="A little room for curiosity." description="A small collection of colors, ideas, and things worth thinking about. Pick something up. See where it takes you." /><BeyondBoard /></div>;
+  return <div className="content-page beyond-page"><PageIntro eyebrow="BEYOND THE TO-DO LIST Day 1 Day 2" title="A little room for curiosity." description="A small collection of colors, ideas, and things worth thinking about. Pick something up. See where it takes you." /><BeyondBoard /></div>;
 }
 
 export default function App() {
