@@ -1,0 +1,51 @@
+/* One continuous portfolio: content is present without any disclosure controls. */
+:root { scroll-padding-top: 18px; }
+.site-shell[data-page="home"] .continuous-portfolio { padding-bottom: 0; }
+.portfolio-section { width: 100%; padding: clamp(65px, 7.7vw, 112px) 5.2%; border-top: 1px solid #85735b22; scroll-margin-top: 0; }
+.section-work { background: #f3eee6; }
+.section-about { background: #e9ece3; }
+.section-beyond { background: #f1e6df; }
+.section-contact { background: #eee7db; }
+.portfolio-section-inner { width: min(1240px, 100%); margin-inline: auto; }
+.portfolio-section-heading { display: grid; grid-template-columns: 1.45fr 1fr; gap: 50px; align-items: end; margin-bottom: 44px; padding-bottom: 33px; border-bottom: 1px solid #78644f30; }
+.section-index { display: flex; align-items: center; gap: 12px; margin: 0 0 23px; font-size: 10px; font-weight: 650; letter-spacing: 1.5px; text-transform: uppercase; color: #766451; }
+.section-index > span { color: #493b2e; }
+.portfolio-section-heading h2 { font: 700 clamp(42px, 5.2vw, 76px)/1.05 Sansation, sans-serif; letter-spacing: -.055em; color: #3e332b; text-wrap: balance; margin: 0; }
+.portfolio-section-heading h2:focus { outline: none; }
+.section-introduction { max-width: 340px; justify-self: end; margin: 0 0 4px; font-size: 14px; font-weight: 450; line-height: 1.9; color: #716354; text-wrap: pretty; }
+.portfolio-section-inner > .content-page { padding: 0; margin: 0; max-width: none; }
+.section-work-lead { font-size: 14px; line-height: 1.85; max-width: 630px; margin: 0 0 30px; color: var(--muted); }
+.portfolio-section .page-next-link { margin-top: 36px; }
+.portfolio-section .contact-page { min-height: 0; gap: 65px; align-items: center; }
+.contact-section-title { font: 700 clamp(30px, 3.4vw, 46px)/1.15 Sansation, sans-serif; letter-spacing: -1.8px; margin-bottom: 20px; }
+.visible-skills { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+.visible-skill { min-width: 0; padding: 25px; border: 1px solid #8d947c30; background: #f7f7ef99; border-radius: 14px; }
+.visible-skill h4 { font: 700 24px/1.2 Sansation, sans-serif; letter-spacing: -.7px; margin-top: 20px; }
+.visible-skill > p { font-size: 12px; line-height: 1.9; color: var(--muted); margin-top: 15px; }
+.visible-skill .skill-tags { margin-top: 22px; gap: 6px; }
+.visible-skill .skill-tags > * { white-space: normal; }
+.skills-heading h3, .visible-process > h3 { font: 700 clamp(25px, 2.8vw, 35px)/1.2 Sansation, sans-serif; letter-spacing: -1px; }
+.visible-process { margin-top: 70px; padding-top: 36px; border-top: 1px solid #858e7130; }
+.visible-process .process-section { padding-top: 22px; }
+.visible-process .process-intro { max-width: 610px; }
+.section-beyond .bb-board { margin-top: 30px; }
+@media (max-width: 900px) {
+  .portfolio-section-heading { gap: 30px; grid-template-columns: 1.2fr 1fr; }
+  .visible-skills { gap: 16px; }
+  .visible-skill { padding: 20px; }
+  .portfolio-section .contact-page { gap: 34px; }
+}
+@media (max-width: 700px) {
+  .portfolio-section { padding: 59px 6%; }
+  .portfolio-section-heading { grid-template-columns: 1fr; gap: 18px; padding-bottom: 26px; margin-bottom: 29px; }
+  .section-index { margin-bottom: 18px; font-size: 9px; }
+  .portfolio-section-heading h2 { font-size: clamp(40px, 10vw, 57px); }
+  .section-introduction { justify-self: start; max-width: 340px; font-size: 12px; line-height: 1.8; }
+  .section-work-lead { font-size: 12px; margin-bottom: 25px; }
+  .visible-skills { grid-template-columns: 1fr; gap: 15px; }
+  .visible-skill { padding: 24px; }
+  .visible-skill h4 { margin-top: 16px; }
+  .visible-process { margin-top: 44px; padding-top: 28px; }
+  .portfolio-section .contact-page { gap: 35px; }
+  .contact-section-title { font-size: 32px; }
+}

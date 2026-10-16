@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import { ArrowRight, ArrowUpRight, BookOpen, Check, ChevronRight, Code2, FileText, MessageCircle, RotateCcw, Sparkles } from "lucide-react";
-import { FocusCards } from "@/components/ui/focus-cards";
+import { InteractiveFocusCards } from "@/components/ui/interactive-focus-cards";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -70,7 +70,7 @@ export function ProjectShowcase() {
   const visible = projects.filter(project => filter === "all" || project.type === filter);
   return <>
     <div className="showcase-toolbar"><Tabs value={filter} onValueChange={setFilter}><TabsList aria-label="Filter projects"><TabsTrigger value="all">All projects <span>04</span></TabsTrigger><TabsTrigger value="ai">AI & full-stack</TabsTrigger><TabsTrigger value="web">Web & motion</TabsTrigger></TabsList></Tabs><p>A few things to click, switch, and explore.</p></div>
-    <FocusCards className="project-focus-grid" cards={visible.map(project => ({ id: project.id, content: <ShowcaseCard project={project} index={projects.indexOf(project)} /> }))} />
+    <InteractiveFocusCards className="project-focus-grid" cards={visible.map(project => ({ id: project.id, content: <ShowcaseCard project={project} index={projects.indexOf(project)} /> }))} />
     <p className="showcase-footnote">The little interactions are sample previews. Follow “Visit project” to try the full app.</p>
   </>;
 }
