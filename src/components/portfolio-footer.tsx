@@ -1,6 +1,5 @@
-import { ArrowRight, ArrowUp, ArrowUpRight, Code2 } from "lucide-react";
+import { ArrowUp, ArrowUpRight, Code2 } from "lucide-react";
 import { useReducedMotion } from "motion/react";
-import { Button } from "@/components/ui/button";
 import { Mark } from "@/components/portfolio-pieces";
 import { routeHref } from "@/lib/portfolio-router";
 import { profile } from "@/portfolio-content";
@@ -10,15 +9,6 @@ export function PortfolioFooter() {
   const reducedMotion = useReducedMotion();
   return <footer className="portfolio-footer">
     <div className="footer-inner">
-      <div className="footer-invitation">
-        <p className="footer-eyebrow"><span /> ONE GOOD CONVERSATION CAN START A LOT.</p>
-        <h2>Got a little <em>“what if?”</em><br />Let’s make it something real.</h2>
-        <p>A useful app, an AI experiment, or an idea you can’t stop thinking about.<br />I’d love to hear it.</p>
-        <div className="footer-cta-row">
-          <Button asChild className="footer-primary"><a href={routeHref("contact")}>Let’s talk <ArrowUpRight size={17} /></a></Button>
-          <Button asChild variant="outline" className="footer-secondary"><a href={routeHref("work")}>Explore my work <ArrowRight size={17} /></a></Button>
-        </div>
-      </div>
       <div className="footer-directory">
         <div className="footer-person">
           <a href={routeHref("home")} className="brand"><Mark /><span>Kajal Tiwari.</span></a>

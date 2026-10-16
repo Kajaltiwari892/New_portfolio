@@ -8,6 +8,7 @@ import "./portrait-hero.css";
 import "./studio-theme.css";
 import "./portfolio-refinements.css";
 import "./sections.css";
+import "./project-editorial.css";
 
 ReactDOM.createRoot(document.getElementById("app")!).render(
   <React.StrictMode><App /></React.StrictMode>

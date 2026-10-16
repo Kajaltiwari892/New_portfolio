@@ -15,3 +15,9 @@ Technology brand icons: Devicon original SVG variants
 Source: https://github.com/devicons/devicon/tree/master/icons
 License: MIT; see tech/LICENSE-Devicon.txt.
 Brand names and logos remain the property of their respective owners.
+
+Project screenshots (2026-10-16):
+assets/projects/abhyaas.jpg ? https://abhyaas-two.vercel.app
+assets/projects/resumeiq.jpg ? https://new-resume-ai.vercel.app
+assets/projects/fizzi.jpg ? https://fizzi-demo.vercel.app
+Captured via WordPress mShots public website thumbnail service; stored locally. AIssist uses a branded editorial cover, not a website screenshot.
