@@ -1,5 +1,5 @@
-import { useState, type CSSProperties, type ReactNode } from "react";
-import { ArrowUpRight, ArrowRight, Code2, BadgeCheck, Box, Expand } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { ArrowUpRight, ArrowRight, Code2, Box, Expand } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import "@/project-showcase.css";
@@ -43,23 +43,27 @@ function LearningPreview() {
   </Dialog>;
 }
 
-function ResumePreview() {
-  return <PreviewWindow title="resumeiq / resume review">
-    <div className="work-resume-preview"><div className="work-resume-score"><BadgeCheck size={20} aria-hidden="true" /><div><strong>Resume compatibility</strong><span>Skills & experience reviewed</span></div><b>92<span>/100</span></b></div><div className="work-resume-feedback"><div><span>Action verb · measurable impact</span><span>Improved</span></div><p>“Built a distributed data pipeline, reducing query latency by 43%.”</p></div></div>
-  </PreviewWindow>;
-}
-
-const waveform = [16, 28, 40, 52, 25, 15, 38, 48, 33, 12, 44, 29, 14, 25, 36, 18, 44, 31];
-function InterviewPreview() {
-  return <PreviewWindow title="aissist / interview practice">
-    <div className="work-interview-preview"><div className="work-interview-session"><span><i />Practice: Frontend developer</span><span>03:42 / 15:00</span></div><div className="work-waveform" aria-hidden="true">{waveform.map((height, index) => <i key={index} style={{ "--wave-height": `${height}px`, "--wave-delay": `${index * -0.13}s` } as CSSProperties} />)}</div><p>“How would you use React Server Components to improve a page’s loading experience?”</p></div>
-  </PreviewWindow>;
+function AppScreenshot({ project }: { project: "resumeiq" | "aissist" }) {
+  const isResume = project === "resumeiq";
+  const name = isResume ? "ResumeIQ" : "AIssist";
+  const src = `/assets/projects/${isResume ? "resumeiq.jpg" : "aissist-preview.jpg"}`;
+  const dimensions = isResume ? { width: 1200, height: 800 } : { width: 1280, height: 720 };
+  const alt = isResume ? "ResumeIQ website with its purple AI resume workspace introduction" : "AIssist interview preparation screen with a sample frontend developer role, tech stack, and camera setup";
+  const caption = isResume ? "Your resume, reimagined by AI" : "Local preview · sample interview";
+  return <Dialog>
+    <div className="work-app-stage">
+      <PreviewWindow title={isResume ? "new-resume-ai.vercel.app" : "AIssist / interview preparation"} sample={false}>
+        <DialogTrigger asChild><button type="button" className="work-app-image" aria-label={`Enlarge ${name} screenshot`}><img src={src} alt={alt} {...dimensions} loading="lazy" decoding="async" /><span className="work-image-expand"><Expand size={15} />View screenshot</span></button></DialogTrigger>
+      </PreviewWindow>
+      <p className="work-app-caption">{caption}</p>
+    </div>
+    <DialogContent className={`work-screenshot-dialog work-app-dialog work-app-dialog-${project}`}><DialogHeader><DialogTitle>Inside {name}</DialogTitle><DialogDescription>{isResume ? "The ResumeIQ website and its AI-powered resume workspace." : "The original AIssist interface, rendered locally with sample interview details."}</DialogDescription></DialogHeader><div className="work-screenshot-scroll" tabIndex={0} role="region" aria-label={`${name} screenshot. Scroll horizontally to explore the full image.`}><img src={src} alt={alt} {...dimensions} /></div><p className="work-screenshot-hint">Scroll the image for a closer look.</p></DialogContent>
+  </Dialog>;
 }
 
 function ProjectVisual({ project }: { project: Project }) {
   if (project.id === "abhyaas") return <LearningPreview />;
-  if (project.id === "resumeiq") return <ResumePreview />;
-  if (project.id === "aissist") return <InterviewPreview />;
+  if (project.id === "resumeiq" || project.id === "aissist") return <AppScreenshot project={project.id} />;
   return <PreviewWindow title="fizzi-demo.vercel.app" sample={false}><div className="work-fizzi-preview"><img src="/assets/projects/fizzi.jpg" alt="Fizzi website with floating cherry and lime soda cans on a bright yellow background" width={1200} height={800} loading="lazy" decoding="async" /><span><Box size={13} />React Three Fiber · 3D scene</span></div></PreviewWindow>;
 }
 

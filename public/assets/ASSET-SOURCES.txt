@@ -20,7 +20,10 @@ Project screenshots (2026-10-16):
 assets/projects/abhyaas.jpg ? https://abhyaas-two.vercel.app
 assets/projects/resumeiq.jpg ? https://new-resume-ai.vercel.app
 assets/projects/fizzi.jpg ? https://fizzi-demo.vercel.app
-Captured via WordPress mShots public website thumbnail service; stored locally. AIssist uses a branded editorial cover, not a website screenshot.
+Captured via WordPress mShots public website thumbnail service; stored locally.
 
 Abhyaas dashboard (2026-10-21):
 assets/projects/abhyaas-dashboard.png — User-provided project screenshot, copied unchanged from Screenshot 2026-10-21 124656.png.
+
+AIssist interface preview (2026-10-21):
+assets/projects/aissist-preview.jpg - Captured locally from the original Header and interview preparation components in https://github.com/Kajaltiwari892/Alssist (commit 956a92f). Original styles and logo; sample frontend developer interview data. Authentication, database access and camera were replaced with local adapters for capture. Not a screenshot of a hosted deployment.
