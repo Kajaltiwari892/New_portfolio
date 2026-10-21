@@ -30,3 +30,6 @@ assets/projects/aissist-preview.jpg - Captured locally from the original Header 
 
 ResumeIQ analysis dashboard (2026-10-21):
 assets/projects/resumeiq-dashboard.png - User-provided image, copied unchanged from public/assets/resumiq. Shows a sample resume analysis workspace.
+
+AIssist interview setup (2026-10-21):
+assets/projects/aissist-interview.png - User-provided image, copied unchanged from public/assets/asslit. Shows the interview overview and device check. Replaces the local interface preview in the project card.

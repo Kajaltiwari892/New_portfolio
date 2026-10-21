@@ -13,7 +13,7 @@ import { parsePortfolioHash, routeHref, type PortfolioRoute } from "@/lib/portfo
 import { profile } from "@/portfolio-content";
 
 const destinations = [
-  { id: "about" as const, label: "About", number: "01", title: "A little more about me.", description: "Curiosity starts the idea. A clear plan turns it into something useful.", link: "Get to know me", icon: PenTool },
+  { id: "about" as const, label: "About", number: "01", title: "A little more about me.", description: "", link: "Get to know me", icon: PenTool },
   { id: "work" as const, label: "Work", number: "02", title: "What I’ve done.", description: "Full-stack apps, AI experiments, and a little play with motion.", link: "Explore the work", icon: Layers3 },
   { id: "beyond" as const, label: "Beyond work", number: "03", title: "The curious corner.", description: "Colors, experiments, and a few thoughts worth keeping.", link: "Take a little detour", icon: Sparkles },
   { id: "contact" as const, label: "Contact", number: "04", title: "Start something good.", description: "Have an idea? A good conversation starts with a small thought.", link: "Let’s talk", icon: ArrowUpRight },
@@ -25,7 +25,7 @@ function HomePage() {
         <div className="portfolio-section-inner">
           {item.id !== "work" && <header className="portfolio-section-heading">
             <div><p className="section-index"><span>{item.number}</span> / {item.label}</p><h2 id={item.id + "-heading"} tabIndex={-1}>{item.title}</h2></div>
-            <p className="section-introduction">{item.description}</p>
+            {item.description && <p className="section-introduction">{item.description}</p>}
           </header>}
             {item.id === "work" ? <WorkPage /> : item.id === "about" ? <AboutPage /> : item.id === "beyond" ? <BeyondSection /> : <ContactPage />}
         </div>
