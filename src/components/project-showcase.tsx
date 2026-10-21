@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { ArrowUpRight, ArrowRight, Code2, Mic, Sparkles } from "lucide-react";
+import { useState, type CSSProperties, type ReactNode } from "react";
+import { ArrowUpRight, ArrowRight, Code2, Sparkles, ShieldCheck, BadgeCheck, Box } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import "@/project-showcase.css";
 
 export const projects = [
   { id: "abhyaas", name: "Abhyaas", category: "AI · LEARNING", type: "ai", tagline: "A little practice. A clearer path.", description: "A study space for CDS aspirants, bringing practice papers, an AI doubt solver, and progress tracking together.", stack: ["Next.js", "FastAPI", "PostgreSQL", "Gemini · RAG"], code: "https://github.com/Kajaltiwari892/Abhyaas", live: "https://abhyaas-two.vercel.app", detail: "I brought the learning flow together—from finding a topic to practising it and revisiting mistakes. The doubt solver retrieves study passages with Qdrant and keeps official previous-year questions separate from generated practice.", skills: "React, TypeScript, Tailwind CSS, Python, FastAPI, SQLAlchemy, PostgreSQL, Qdrant, Gemini, Three.js, Motion" },
@@ -17,22 +17,73 @@ function ProjectDetails({ project }: { project: Project }) {
   return <DialogContent className="project-detail-dialog"><DialogHeader><span className="mini-eyebrow">{project.category}</span><DialogTitle>{project.name}</DialogTitle><DialogDescription>{project.tagline}</DialogDescription></DialogHeader><p>{project.detail}</p><div className="project-detail-skills"><h3>What I worked with</h3><p>{project.skills}</p></div><div className="project-detail-links">{project.live && <Button asChild><a href={project.live} target="_blank" rel="noreferrer">Visit website <ArrowUpRight size={15} /></a></Button>}<Button asChild variant="outline"><a href={project.code} target="_blank" rel="noreferrer">Explore code <Code2 size={15} /></a></Button></div></DialogContent>;
 }
 
+const presentation = {
+  abhyaas: { label: "Featured flagship", note: "AI & learning", intro: "A clearer path from practice to preparation.", body: "Built for CDS aspirants. Previous-year papers, an AI doubt solver, and progress tracking come together in one focused study space." },
+  resumeiq: { label: "AI productivity", note: "Career tools", intro: "An AI resume workspace for sharper feedback, stronger bullet points, and a better job match." },
+  aissist: { label: "AI & voice", note: "Interview practice", intro: "Role-based mock interviews with spoken answers and useful feedback for the real conversation." },
+  fizzi: { label: "Creative web & 3D", note: "Motion study", intro: "A playful 3D product showcase with a little fizz.", body: "An exploration of product storytelling through interactive 3D cans, colorful scenes, and scroll-led GSAP transitions, with content powered by Prismic." },
+};
+
+function PreviewWindow({ title, sample = true, children }: { title: string; sample?: boolean; children: ReactNode }) {
+  return <div className="work-preview-window">
+    <div className="work-browser-bar"><span className="work-browser-dots" aria-hidden="true"><i /><i /><i /></span><span className="work-browser-title">{title}</span>{sample ? <span className="work-preview-label">Sample preview</span> : <ArrowUpRight size={13} aria-hidden="true" />}</div>
+    {children}
+  </div>;
+}
+
+function LearningPreview() {
+  return <PreviewWindow title="abhyaas / practice overview">
+    <div className="work-learning-preview">
+      <div className="work-exam-heading"><div><span className="work-preview-kicker">Mock examination #12</span><h4>General Knowledge & Defence Strategy</h4></div><div className="work-readiness"><ShieldCheck size={15} /><span>Readiness: high<strong>84.2%</strong></span></div></div>
+      <div className="work-metrics">
+        <div className="work-metric"><span>Time efficiency</span><div><strong>48<small>s</small></strong><span>avg / question</span></div><div className="work-meter"><i style={{ width: "78%" }} /></div></div>
+        <div className="work-metric"><span>Accuracy trend</span><div><strong>+14<small>%</small></strong><span>vs. last mock</span></div><div className="work-meter work-meter-sage"><i style={{ width: "85%" }} /></div></div>
+        <div className="work-metric work-focus"><span>Recommended focus</span><strong>Modern Indian History</strong><span className="work-flashcards">3 flashcards queued</span></div>
+      </div>
+      <div className="work-doubt"><Sparkles size={17} aria-hidden="true" /><p>“Help me understand the key events of the Indo-Tibetan border agreement.”</p><span><i />RAG<br />assisted</span></div>
+    </div>
+  </PreviewWindow>;
+}
+
+function ResumePreview() {
+  return <PreviewWindow title="resumeiq / resume review">
+    <div className="work-resume-preview"><div className="work-resume-score"><BadgeCheck size={20} aria-hidden="true" /><div><strong>Resume compatibility</strong><span>Skills & experience reviewed</span></div><b>92<span>/100</span></b></div><div className="work-resume-feedback"><div><span>Action verb · measurable impact</span><span>Improved</span></div><p>“Built a distributed data pipeline, reducing query latency by 43%.”</p></div></div>
+  </PreviewWindow>;
+}
+
+const waveform = [16, 28, 40, 52, 25, 15, 38, 48, 33, 12, 44, 29, 14, 25, 36, 18, 44, 31];
+function InterviewPreview() {
+  return <PreviewWindow title="aissist / interview practice">
+    <div className="work-interview-preview"><div className="work-interview-session"><span><i />Practice: Frontend developer</span><span>03:42 / 15:00</span></div><div className="work-waveform" aria-hidden="true">{waveform.map((height, index) => <i key={index} style={{ "--wave-height": `${height}px`, "--wave-delay": `${index * -0.13}s` } as CSSProperties} />)}</div><p>“How would you use React Server Components to improve a page’s loading experience?”</p></div>
+  </PreviewWindow>;
+}
+
 function ProjectVisual({ project }: { project: Project }) {
-  return <>
-    {project.live ? <div className="website-window"><div className="website-chrome" aria-hidden="true"><span><i /><i /><i /></span><small>{new URL(project.live).hostname}</small><ArrowUpRight size={12} /></div><img src={`/assets/projects/${project.id}.jpg`} alt={`${project.name} website preview`} width={1200} height={800} loading="lazy" decoding="async" /></div> : <div className="interview-cover"><span className="interview-cover-label"><Mic size={16} /> AIssist</span><div className="interview-orbit" aria-hidden="true"><span /><span /><Mic size={43} strokeWidth={1} /></div><strong>Find your voice.<br />Build your confidence.</strong><span className="interview-cover-caption">AI-POWERED INTERVIEW PRACTICE</span></div>}
-    <span className="preview-launch">{project.live ? "Visit website" : "Explore project"}<ArrowUpRight size={18} /></span>
-  </>;
+  if (project.id === "abhyaas") return <LearningPreview />;
+  if (project.id === "resumeiq") return <ResumePreview />;
+  if (project.id === "aissist") return <InterviewPreview />;
+  return <PreviewWindow title="fizzi-demo.vercel.app" sample={false}><div className="work-fizzi-preview"><img src="/assets/projects/fizzi.jpg" alt="Fizzi website with floating cherry and lime soda cans on a bright yellow background" width={1200} height={800} loading="lazy" decoding="async" /><span><Box size={13} />React Three Fiber · 3D scene</span></div></PreviewWindow>;
 }
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
-  return <Dialog><article className={`project-exhibit exhibit-${project.id}`}>
-    {project.live ? <a href={project.live} target="_blank" rel="noreferrer" className="exhibit-visual" aria-label={`Visit ${project.name} website (opens in a new tab)`}><ProjectVisual project={project} /></a> : <DialogTrigger asChild><button className="exhibit-visual" aria-label={`About ${project.name}`}><ProjectVisual project={project} /></button></DialogTrigger>}
-    <div className="exhibit-info"><div className="exhibit-eyebrow"><span>0{index + 1} / {project.category}</span>{!project.live && <span>CODE AVAILABLE</span>}</div><div className="exhibit-title"><h3>{project.name}</h3><DialogTrigger asChild><button className="exhibit-about">About the project <ArrowRight size={15} /></button></DialogTrigger></div><p>{project.description}</p><div className="exhibit-bottom"><div className="exhibit-stack">{project.stack.map(tool => <span key={tool}>{tool}</span>)}</div><a href={project.code} target="_blank" rel="noreferrer" aria-label={`${project.name} source code on GitHub`}><Code2 size={19} /></a></div></div>
+  const copy = presentation[project.id];
+  return <Dialog><article className={`work-card work-card-${project.id}`} aria-labelledby={`${project.id}-title`}>
+    <div className="work-card-copy"><div className="work-card-meta"><span>0{index + 1} / {copy.label}</span><span>{copy.note}</span></div><h3 id={`${project.id}-title`}>{project.name}</h3><p className="work-card-intro">{copy.intro}</p>{"body" in copy && <p className="work-card-description">{copy.body}</p>}</div>
+    <div className="work-card-preview"><ProjectVisual project={project} /></div>
+    <div className="work-card-footer"><ul className="work-tech-list" aria-label={`${project.name} technologies`}>{project.stack.map(tool => <li key={tool}>{tool}</li>)}</ul><div className="work-card-actions">
+      {project.live ? <a className="work-primary-action" href={project.live} target="_blank" rel="noreferrer" aria-label={`Visit ${project.name} website (opens in a new tab)`}>Visit website <ArrowUpRight size={15} /></a> : <DialogTrigger asChild><button className="work-primary-action">View project <ArrowUpRight size={15} /></button></DialogTrigger>}
+      {project.live ? <DialogTrigger asChild><button className="work-secondary-action">{project.id === "abhyaas" ? "Project details" : "Details"}<ArrowRight size={14} /></button></DialogTrigger> : <a className="work-secondary-action" href={project.code} target="_blank" rel="noreferrer" aria-label="AIssist on GitHub (opens in a new tab)">GitHub <Code2 size={14} /></a>}
+    </div></div>
   </article><ProjectDetails project={project} /></Dialog>;
 }
 
+const filters = [{ id: "all", label: "All projects", count: true }, { id: "ai", label: "AI & Full-Stack" }, { id: "web", label: "Web & Motion" }];
 export function ProjectShowcase() {
   const [filter, setFilter] = useState("all");
   const visible = projects.filter(project => filter === "all" || project.type === filter);
-  return <div className="project-gallery"><div className="exhibit-toolbar"><Tabs value={filter} onValueChange={setFilter}><TabsList aria-label="Filter projects"><TabsTrigger value="all">All projects <span>04</span></TabsTrigger><TabsTrigger value="ai">AI & full-stack</TabsTrigger><TabsTrigger value="web">Web & motion</TabsTrigger></TabsList></Tabs><span><Sparkles size={14} /> Built to be explored.</span></div><div className="exhibit-grid">{visible.map(project => <ProjectCard key={project.id} project={project} index={projects.indexOf(project)} />)}</div></div>;
+  return <div className="work-gallery">
+    <header className="work-gallery-header"><div><p className="work-gallery-eyebrow"><span />Selected works / development & experiments</p><h2 id="work-heading" tabIndex={-1}>Platforms built with editorial rigor & intent.</h2></div><div className="work-filters" role="group" aria-label="Filter projects">{filters.map(item => <button key={item.id} type="button" aria-pressed={filter === item.id} aria-controls="selected-projects" onClick={() => setFilter(item.id)}>{item.label}{item.count && <span> ({projects.length})</span>}</button>)}</div></header>
+    <p className="sr-only" role="status">Showing {visible.length} {visible.length === 1 ? "project" : "projects"}.</p>
+    <div id="selected-projects" className="work-gallery-grid">{visible.map(project => <ProjectCard key={project.id} project={project} index={projects.indexOf(project)} />)}</div>
+  </div>;
 }

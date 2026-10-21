@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useState, type MouseEvent } from "react";
 import { MotionConfig, useReducedMotion } from "motion/react";
-import { ArrowRight, ArrowUpRight, Layers3, PenTool, Sparkles } from "lucide-react";
+import { ArrowUpRight, Layers3, PenTool, Sparkles } from "lucide-react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProfessionalAbout } from "@/components/professional-about";
 import { PortraitHero } from "@/components/portrait-hero";
@@ -23,10 +23,10 @@ function HomePage() {
     <PortraitHero />
     {destinations.map(item => <section key={item.id} id={item.id} className={"portfolio-section section-" + item.id} aria-labelledby={item.id + "-heading"}>
         <div className="portfolio-section-inner">
-          <header className="portfolio-section-heading">
+          {item.id !== "work" && <header className="portfolio-section-heading">
             <div><p className="section-index"><span>{item.number}</span> / {item.label}</p><h2 id={item.id + "-heading"} tabIndex={-1}>{item.title}</h2></div>
             <p className="section-introduction">{item.description}</p>
-          </header>
+          </header>}
             {item.id === "work" ? <WorkPage /> : item.id === "about" ? <AboutPage /> : item.id === "beyond" ? <BeyondSection /> : <ContactPage />}
         </div>
       </section>)}
@@ -34,10 +34,7 @@ function HomePage() {
 }
 
 function WorkPage() {
-  return <div className="content-page work-page"><p className="section-work-lead">Things I’ve built to make learning easier, job hunting clearer, and the web a little more fun. There’s a little something to try in each one.</p>
-    <ProjectShowcase />
-    <a href={routeHref("about")} className="page-next-link">Curious about the process? <ArrowRight size={17} /></a>
-  </div>;
+  return <div className="content-page work-page"><ProjectShowcase /></div>;
 }
 
 function AboutPage() { return <ProfessionalAbout />; }
