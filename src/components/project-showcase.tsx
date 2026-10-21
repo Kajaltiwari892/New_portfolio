@@ -46,10 +46,10 @@ function LearningPreview() {
 function AppScreenshot({ project }: { project: "resumeiq" | "aissist" }) {
   const isResume = project === "resumeiq";
   const name = isResume ? "ResumeIQ" : "AIssist";
-  const src = `/assets/projects/${isResume ? "resumeiq.jpg" : "aissist-preview.jpg"}`;
-  const dimensions = isResume ? { width: 1200, height: 800 } : { width: 1280, height: 720 };
-  const alt = isResume ? "ResumeIQ website with its purple AI resume workspace introduction" : "AIssist interview preparation screen with a sample frontend developer role, tech stack, and camera setup";
-  const caption = isResume ? "Your resume, reimagined by AI" : "Local preview · sample interview";
+  const src = `/assets/projects/${isResume ? "resumeiq-dashboard.png" : "aissist-preview.jpg"}`;
+  const dimensions = isResume ? { width: 1672, height: 941 } : { width: 1280, height: 720 };
+  const alt = isResume ? "ResumeIQ analysis dashboard with a sample resume, a resume score, priority fixes, and a score breakdown" : "AIssist interview preparation screen with a sample frontend developer role, tech stack, and camera setup";
+  const caption = isResume ? "Inside the resume analysis workspace" : "Local preview · sample interview";
   return <Dialog>
     <div className="work-app-stage">
       <PreviewWindow title={isResume ? "new-resume-ai.vercel.app" : "AIssist / interview preparation"} sample={false}>
@@ -57,7 +57,7 @@ function AppScreenshot({ project }: { project: "resumeiq" | "aissist" }) {
       </PreviewWindow>
       <p className="work-app-caption">{caption}</p>
     </div>
-    <DialogContent className={`work-screenshot-dialog work-app-dialog work-app-dialog-${project}`}><DialogHeader><DialogTitle>Inside {name}</DialogTitle><DialogDescription>{isResume ? "The ResumeIQ website and its AI-powered resume workspace." : "The original AIssist interface, rendered locally with sample interview details."}</DialogDescription></DialogHeader><div className="work-screenshot-scroll" tabIndex={0} role="region" aria-label={`${name} screenshot. Scroll horizontally to explore the full image.`}><img src={src} alt={alt} {...dimensions} /></div><p className="work-screenshot-hint">Scroll the image for a closer look.</p></DialogContent>
+    <DialogContent className={`work-screenshot-dialog work-app-dialog work-app-dialog-${project}`}><DialogHeader><DialogTitle>Inside {name}</DialogTitle><DialogDescription>{isResume ? "A closer look at resume analysis, actionable feedback, and suggested improvements." : "The original AIssist interface, rendered locally with sample interview details."}</DialogDescription></DialogHeader><div className="work-screenshot-scroll" tabIndex={0} role="region" aria-label={`${name} screenshot. Scroll horizontally to explore the full image.`}><img src={src} alt={alt} {...dimensions} /></div><p className="work-screenshot-hint">Scroll the image for a closer look.</p></DialogContent>
   </Dialog>;
 }
 

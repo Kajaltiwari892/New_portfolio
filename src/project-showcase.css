@@ -111,7 +111,7 @@
 .work-screenshot-hint { display: none; font-size: 11px; color: #c2cbb5; }
 .work-app-stage { min-width: 0; }
 .work-app-image { display: block; position: relative; width: 100%; padding: 0; border: 0; background: var(--preview-bg); overflow: hidden; cursor: zoom-in; }
-.work-app-image img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; object-position: center; background: #fff; transition: transform .5s ease; }
+.work-app-image img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; object-position: center; background: #fff; transition: transform .5s ease; }
 .work-card-resumeiq .work-app-image img { background: #0c0318; }
 .work-app-image .work-image-expand { color: var(--card-button-text); background: var(--card-button); border-color: var(--card-line); }
 .work-app-image:focus-visible { outline: 3px solid var(--card-accent); outline-offset: -3px; }
