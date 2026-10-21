@@ -1,5 +1,5 @@
 import { useState, type CSSProperties, type ReactNode } from "react";
-import { ArrowUpRight, ArrowRight, Code2, Sparkles, ShieldCheck, BadgeCheck, Box } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Code2, BadgeCheck, Box, Expand } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import "@/project-showcase.css";
@@ -32,17 +32,15 @@ function PreviewWindow({ title, sample = true, children }: { title: string; samp
 }
 
 function LearningPreview() {
-  return <PreviewWindow title="abhyaas / practice overview">
-    <div className="work-learning-preview">
-      <div className="work-exam-heading"><div><span className="work-preview-kicker">Mock examination #12</span><h4>General Knowledge & Defence Strategy</h4></div><div className="work-readiness"><ShieldCheck size={15} /><span>Readiness: high<strong>84.2%</strong></span></div></div>
-      <div className="work-metrics">
-        <div className="work-metric"><span>Time efficiency</span><div><strong>48<small>s</small></strong><span>avg / question</span></div><div className="work-meter"><i style={{ width: "78%" }} /></div></div>
-        <div className="work-metric"><span>Accuracy trend</span><div><strong>+14<small>%</small></strong><span>vs. last mock</span></div><div className="work-meter work-meter-sage"><i style={{ width: "85%" }} /></div></div>
-        <div className="work-metric work-focus"><span>Recommended focus</span><strong>Modern Indian History</strong><span className="work-flashcards">3 flashcards queued</span></div>
-      </div>
-      <div className="work-doubt"><Sparkles size={17} aria-hidden="true" /><p>“Help me understand the key events of the Indo-Tibetan border agreement.”</p><span><i />RAG<br />assisted</span></div>
+  return <Dialog>
+    <div className="work-dashboard-stage">
+      <PreviewWindow title="abhyaas-two.vercel.app" sample={false}>
+        <DialogTrigger asChild><button className="work-dashboard-image" aria-label="Enlarge Abhyaas dashboard screenshot"><img src="/assets/projects/abhyaas-dashboard.png" alt="Abhyaas study dashboard in forest green, with a daily study mission, a learning companion, a focus timer, and progress tracking" width={2844} height={1522} loading="lazy" decoding="async" /><span className="work-image-expand"><Expand size={15} />View screenshot</span></button></DialogTrigger>
+      </PreviewWindow>
+      <div className="work-preview-caption"><span><i />Inside the study workspace</span><span>Practice. Learn. Repeat.</span></div>
     </div>
-  </PreviewWindow>;
+    <DialogContent className="work-screenshot-dialog"><DialogHeader><DialogTitle>Inside Abhyaas</DialogTitle><DialogDescription>The daily study workspace, from a focused plan to progress over time.</DialogDescription></DialogHeader><div className="work-screenshot-scroll" tabIndex={0} role="region" aria-label="Abhyaas dashboard screenshot. Scroll horizontally to explore the full image."><img src="/assets/projects/abhyaas-dashboard.png" alt="Full Abhyaas dashboard showing a study plan, learning companion, focus timer, and daily progress" width={2844} height={1522} /></div><p className="work-screenshot-hint">Scroll the image to explore the dashboard.</p></DialogContent>
+  </Dialog>;
 }
 
 function ResumePreview() {
@@ -68,7 +66,7 @@ function ProjectVisual({ project }: { project: Project }) {
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   const copy = presentation[project.id];
   return <Dialog><article className={`work-card work-card-${project.id}`} aria-labelledby={`${project.id}-title`}>
-    <div className="work-card-copy"><div className="work-card-meta"><span>0{index + 1} / {copy.label}</span><span>{copy.note}</span></div><h3 id={`${project.id}-title`}>{project.name}</h3><p className="work-card-intro">{copy.intro}</p>{"body" in copy && <p className="work-card-description">{copy.body}</p>}</div>
+    <div className="work-card-copy"><div className="work-card-meta"><span><b className="work-project-index">0{index + 1}</b>{copy.label}</span><span>{copy.note}</span></div><h3 id={`${project.id}-title`}>{project.name}</h3><p className="work-card-intro">{copy.intro}</p>{"body" in copy && <p className="work-card-description">{copy.body}</p>}</div>
     <div className="work-card-preview"><ProjectVisual project={project} /></div>
     <div className="work-card-footer"><ul className="work-tech-list" aria-label={`${project.name} technologies`}>{project.stack.map(tool => <li key={tool}>{tool}</li>)}</ul><div className="work-card-actions">
       {project.live ? <a className="work-primary-action" href={project.live} target="_blank" rel="noreferrer" aria-label={`Visit ${project.name} website (opens in a new tab)`}>Visit website <ArrowUpRight size={15} /></a> : <DialogTrigger asChild><button className="work-primary-action">View project <ArrowUpRight size={15} /></button></DialogTrigger>}

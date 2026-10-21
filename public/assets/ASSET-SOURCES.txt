@@ -21,3 +21,6 @@ assets/projects/abhyaas.jpg ? https://abhyaas-two.vercel.app
 assets/projects/resumeiq.jpg ? https://new-resume-ai.vercel.app
 assets/projects/fizzi.jpg ? https://fizzi-demo.vercel.app
 Captured via WordPress mShots public website thumbnail service; stored locally. AIssist uses a branded editorial cover, not a website screenshot.
+
+Abhyaas dashboard (2026-10-21):
+assets/projects/abhyaas-dashboard.png — User-provided project screenshot, copied unchanged from Screenshot 2026-10-21 124656.png.
