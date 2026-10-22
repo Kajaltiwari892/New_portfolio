@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Contact form UI test</title></head>
+  <body>
+    <aside style="position:fixed;top:0;left:0;right:0;z-index:9999;padding:10px;background:#272727;color:white;font:14px system-ui;display:flex;gap:12px;flex-wrap:wrap">
+      <strong>Contact test — simulated responses, no emails sent.</strong>
+      <label>Provider response <select id="test-response" style="color:black;background:white"><option value="error">Service error</option><option value="success">Accepted</option><option value="activation">Needs activation</option></select></label>
+      <output id="request-count">Requests: 0</output>
+    </aside>
+    <div id="app"></div>
+    <script type="module">
+      const originalFetch = window.fetch.bind(window);
+      let count = 0;
+      window.fetch = async (url, options) => {
+        if (!String(url).startsWith('https://formsubmit.co/')) return originalFetch(url, options);
+        const mode = document.querySelector('#test-response').value;
+        document.querySelector('#request-count').textContent = `Requests: ${++count}`;
+        await new Promise(resolve => setTimeout(resolve, 1400));
+        if (mode === 'error') return new Response(JSON.stringify({ success: false }), {status:503});
+        return new Response(JSON.stringify(mode === 'activation'
+          ? { success:true, message:'This form needs activation. Check your email.' }
+          : { success:true, message:'Email sent successfully' }));
+      };
+      await import('../src/main.tsx');
+    </script>
+  </body>
+</html>

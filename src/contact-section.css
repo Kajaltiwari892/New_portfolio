@@ -26,6 +26,16 @@
 .contact-form-bottom { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .contact-form-bottom button { display: inline-flex; align-items: center; justify-content: center; gap: 27px; min-height: 48px; border: 1px solid #5c4431; border-radius: 9px; padding: 13px 20px; background: #604631; color: #fff9ee; font-size: 13px; font-weight: 700; transition: background .2s; }
 .contact-form-bottom button:hover { background: #473322; }
+.contact-form-bottom button:disabled { cursor: wait; opacity: .75; }
+.contact-field :is(input, textarea):disabled { opacity: .7; cursor: wait; }
+.contact-spinner { animation: contact-spin 1s linear infinite; }
+.contact-feedback:empty { display: none; }
+.contact-feedback { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px; border-radius: 10px; font-size: 13px; line-height: 1.65; }
+.contact-feedback > svg { flex-shrink: 0; margin-top: 2px; }
+.contact-feedback[data-state="success"] { color: #38503b; background: #eaf0e4; border: 1px solid #bdcbb1; }
+.contact-feedback[data-state="error"] { color: #7b432e; background: #f7eae1; border: 1px solid #ddc0ac; }
+.contact-feedback a { display: inline-flex; align-items: center; gap: 4px; text-decoration: underline; text-underline-offset: 3px; }
+@keyframes contact-spin { to { transform: rotate(360deg); } }
 .contact-form-bottom p { color: #7e6c5b; font-size: 10px; line-height: 1.6; }
 .contact-form-bottom p a { text-decoration: underline; text-underline-offset: 3px; }
 .contact-honeypot { display: none; }
@@ -53,5 +63,6 @@
   .contact-direct > a { font-size: 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .contact-spinner { animation: none; }
   .contact-studio :is(a, button, input, textarea) { transition: none; }
 }

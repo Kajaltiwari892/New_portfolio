@@ -2,9 +2,13 @@
 
 ## Contact form and resume
 
-The contact form posts name, email, and message to [FormSubmit](https://formsubmit.co/) for delivery to `kanjal55567@gmail.com`. Submit a first message from the deployed site, then open the activation email in that inbox and confirm the form. Delivery requires this one-time activation; inbox delivery has not been verified from the development environment. FormSubmit handles submission errors and its default CAPTCHA, with an additional hidden honeypot in the form. The sender's email becomes the reply-to address.
+The contact form sends name, email, and message to [FormSubmit’s AJAX endpoint](https://formsubmit.co/ajax-documentation) for delivery to `kanjal55567@gmail.com`, using the public endpoint identifier supplied in the owner's activation email. Visitors stay on the portfolio. The form shows sending, accepted, and error states; it retains the message after a failure and prevents duplicate clicks while a request is pending. The sender's email is the reply-to address. A hidden honeypot is included; no CAPTCHA-disabling option is sent.
 
-After a successful submission, FormSubmit redirects to `public/thanks.html`. If the production domain changes, update `thankYouUrl` in `src/components/contact-section.tsx`. A direct email link is also available.
+The owner must click **ACTIVATE FORM** in the email from FormSubmit before inbox delivery works. Visitors do not activate anything. If FormSubmit requests activation for a new deployment origin, confirm the corresponding email once. An HTTP 200 alone is not treated as success: the response must explicitly accept the message and must not request activation. Tests mock provider responses; they do not establish inbox delivery. A direct email link remains available if the service fails. The older `public/thanks.html` remains for existing links but is no longer used by the form.
+
+Run `node --test tests/contact.test.mjs` to check delivery-response handling without sending email.
+
+For browser checks, open `/tests/contact-ui.html#contact` on the Vite development server. This isolated fixture simulates accepted, failed, and activation responses without contacting the email service. It is excluded from the production build.
 
 The navbar opens `public/assets/KajalTiwariResume.pdf` in a new tab. Replace that file to update the resume, or edit `profile.resume` in `src/portfolio-content.ts` to use another path.
 
