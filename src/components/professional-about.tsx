@@ -8,6 +8,7 @@ export function ProfessionalAbout() {
       <div className="professional-summary">
         <p className="summary-primary">I’m Kajal, a full-stack developer building web applications with thoughtful interfaces and practical AI features.</p>
         <p>I’m still learning, and I enjoy that part. I care about understanding the problem, making deliberate choices, and building something people can actually use.</p>
+        <p>Outside coding, I enjoy painting and reading about cosmology, physics, and science.</p>
       </div>
     </div>
   </div>;

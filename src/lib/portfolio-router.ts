@@ -4,7 +4,6 @@ export type PortfolioRoute =
   | "home"
   | "work"
   | "about"
-  | "beyond"
   | "contact"
   | "not-found";
 
@@ -14,7 +13,6 @@ const routePaths: Record<NavigableRoute, string> = {
   home: "#home",
   work: "#work",
   about: "#about",
-  beyond: "#beyond",
   contact: "#contact",
 };
 
@@ -24,15 +22,15 @@ const hashRoutes = new Map<string, PortfolioRoute>([
   ["#/", "home"],
   ["#/work", "work"],
   ["#/about", "about"],
-  ["#/beyond", "beyond"],
+  ["#/beyond", "about"],
   ["#/contact", "contact"],
-  ["#/hobbies", "beyond"],
+  ["#/hobbies", "about"],
   ["#home", "home"],
   ["#work", "work"],
   ["#about", "about"],
-  ["#beyond", "beyond"],
+  ["#beyond", "about"],
   ["#approach", "about"],
-  ["#notes", "beyond"],
+  ["#notes", "about"],
   ["#questions", "contact"],
   ["#contact", "contact"],
 ]);

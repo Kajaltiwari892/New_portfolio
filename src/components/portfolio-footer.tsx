@@ -18,7 +18,7 @@ export function PortfolioFooter() {
             {profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noreferrer" aria-label="Kajal on LinkedIn"><strong aria-hidden="true">in</strong></a>}
           </div>
         </div>
-        <nav aria-label="Footer explore"><h3>Explore</h3><a href={routeHref("home")}>Home</a><a href={routeHref("about")}>About me</a><a href={routeHref("work")}>What I’ve done</a><a href={routeHref("beyond")}>Beyond work</a></nav>
+        <nav aria-label="Footer explore"><h3>Explore</h3><a href={routeHref("home")}>Home</a><a href={routeHref("about")}>About me</a><a href={routeHref("work")}>What I’ve done</a></nav>
         <nav aria-label="Footer projects"><h3>On my GitHub</h3>{projects.map(project => <a key={project.id} href={project.code} target="_blank" rel="noreferrer">{project.name}<ArrowUpRight size={13} /></a>)}</nav>
         <nav aria-label="Footer connect"><h3>Say hello</h3><a href={routeHref("contact")}>Start a conversation <ArrowUpRight size={13} /></a>{profile.github && <a href={profile.github} target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={13} /></a>}{profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn <ArrowUpRight size={13} /></a>}<span className="footer-note">Always up for a good idea.</span></nav>
       </div>
