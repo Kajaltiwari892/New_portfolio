@@ -15,7 +15,7 @@ import { profile } from "@/portfolio-content";
 const destinations = [
   { id: "about" as const, label: "About", number: "01", title: "A little more about me.", description: "", link: "Get to know me", icon: PenTool },
   { id: "work" as const, label: "Work", number: "02", title: "What I’ve done.", description: "Full-stack apps, AI experiments, and a little play with motion.", link: "Explore the work", icon: Layers3 },
-  { id: "beyond" as const, label: "Beyond work", number: "03", title: "The curious corner.", description: "Colors, experiments, and a few thoughts worth keeping.", link: "Take a little detour", icon: Sparkles },
+  { id: "beyond" as const, label: "Beyond work", number: "03", title: "The curious corner.", description: "", link: "Take a little detour", icon: Sparkles },
   { id: "contact" as const, label: "Contact", number: "04", title: "Start something good.", description: "Have an idea? A good conversation starts with a small thought.", link: "Let’s talk", icon: ArrowUpRight },
 ];
 function HomePage() {

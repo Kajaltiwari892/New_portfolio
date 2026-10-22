@@ -45,12 +45,13 @@
   .exhibit-visual:hover .interview-orbit { animation: orbit-breathe 2s ease-in-out infinite alternate; }
 }
 @keyframes orbit-breathe { to { transform: scale(1.08); box-shadow: 0 0 75px #70b6c0b0; } }
-.professional-intro { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(35px,6vw,95px); padding: 25px 0 75px; }
+.professional-intro { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(35px,6vw,95px); padding: 25px 0 0; }
 .about-overline { display: block; font-size: 9px; letter-spacing: 1.4px; font-weight: 650; color: #6a705b; line-height: 1.7; }
 .professional-intro h3 { font: 700 clamp(36px,4.3vw,61px)/1.12 Sansation,sans-serif; letter-spacing: -2.4px; color: #354039; margin-top: 26px; }
 .professional-intro h3 em { font-family: "Instrument Serif",Georgia,serif; font-weight: 400; color: #6f7354; }
 .professional-summary > p { font-size: 14px; line-height: 1.9; color: #636a60; margin-bottom: 19px; }
 .professional-summary > .summary-primary { font-size: clamp(20px,2vw,26px); line-height: 1.5; color: #354039; letter-spacing: -.5px; }
+.professional-summary > p:last-child { margin-bottom: 0; }
 .professional-summary > a { display: inline-flex; align-items: center; gap: 14px; border-bottom: 1px solid #919681; padding: 8px 0; font-size: 12px; color: #3c4d40; margin-top: 6px; }
 .professional-skills { display: grid; grid-template-columns: .8fr 1.5fr; gap: 60px; padding: 48px 0 68px; border-top: 1px solid #7a836930; }
 .about-subheading h3 { font: 700 clamp(28px,3vw,39px)/1.15 Sansation,sans-serif; letter-spacing: -1.2px; color: #354039; margin-top: 16px; }
@@ -92,7 +93,7 @@
   .exhibit-toolbar { align-items: flex-start; margin-bottom: 24px; }.exhibit-toolbar > span { display: none; }.exhibit-toolbar [data-slot=tabs-trigger] { padding: 9px 11px; font-size: 10px; }
   .exhibit-grid { grid-template-columns: 1fr; gap: 27px; }.exhibit-visual { aspect-ratio: 1.5; padding: 24px 22px 0; }.exhibit-title h3 { font-size: 32px; }.exhibit-info > p { font-size: 13px; }.exhibit-about { font-size: 10px; }.exhibit-eyebrow { font-size: 8px; }
   .interview-cover > strong { font-size: 34px; }.interview-cover-caption { font-size: 7px; }.interview-orbit { width: 85px; height: 85px; top: 13%; }
-  .professional-intro { grid-template-columns: 1fr; gap: 30px; padding: 8px 0 40px; }.professional-intro h3 { font-size: 43px; letter-spacing: -1.8px; }.professional-summary > p { font-size: 13px; }.professional-summary > .summary-primary { font-size: 22px; }
+  .professional-intro { grid-template-columns: 1fr; gap: 30px; padding: 8px 0 0; }.professional-intro h3 { font-size: 43px; letter-spacing: -1.8px; }.professional-summary > p { font-size: 13px; }.professional-summary > .summary-primary { font-size: 22px; }
   .professional-skills { grid-template-columns: 1fr; padding: 35px 0 40px; gap: 30px; }.about-subheading h3 { font-size: 31px; }.professional-approach { padding-top: 35px; }
   .approach-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }.approach-cell { padding: 23px 20px; }.approach-cell:nth-child(3n) { border-right: 1px solid #8b947835; }.approach-cell:nth-child(2n) { border-right: 0; }.approach-cell:nth-child(n+4) { border-bottom: 1px solid #8b947835; }.approach-cell:nth-child(n+5) { border-bottom: 0; }.approach-cell h4 { font-size: 20px; }.approach-cell > p { font-size: 12px; }.approach-outcome { font-size: 9px; }
   .ai-principle { padding: 26px; gap: 16px; grid-template-columns: 1fr; margin-top: 30px; }.ai-principle-icon { display: none; }.ai-principle-note { grid-column: auto; font-size: 18px; }.ai-principle h3 { font-size: 27px; }
