@@ -1,14 +1,16 @@
-/** Verified profile links; contact details remain unset until supplied. */
+/** Profile links and contact details supplied by the portfolio owner. */
 export const profile: {
   name: string | null;
   email: string | null;
   github: string | null;
   linkedin: string | null;
+  resume: string;
 } = {
   name: "Kajal Tiwari",
-  email: null,
+  email: "kanjal55567@gmail.com",
   github: "https://github.com/Kajaltiwari892",
   linkedin: "https://www.linkedin.com/in/kajal-tiwari-46802034a/",
+  resume: "/assets/KajalTiwariResume.pdf",
 };
 
 export const strengths = [

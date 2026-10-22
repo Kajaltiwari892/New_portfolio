@@ -1,5 +1,15 @@
 # Folio personal portfolio
 
+## Contact form and resume
+
+The contact form posts name, email, and message to [FormSubmit](https://formsubmit.co/) for delivery to `kanjal55567@gmail.com`. Submit a first message from the deployed site, then open the activation email in that inbox and confirm the form. Delivery requires this one-time activation; inbox delivery has not been verified from the development environment. FormSubmit handles submission errors and its default CAPTCHA, with an additional hidden honeypot in the form. The sender's email becomes the reply-to address.
+
+After a successful submission, FormSubmit redirects to `public/thanks.html`. If the production domain changes, update `thankYouUrl` in `src/components/contact-section.tsx`. A direct email link is also available.
+
+The navbar opens `public/assets/KajalTiwariResume.pdf` in a new tab. Replace that file to update the resume, or edit `profile.resume` in `src/portfolio-content.ts` to use another path.
+
+The older implementation notes below are retained for reference; the current site is one continuous page with Home, About, Work, and Contact sections.
+
 A responsive portfolio built with React, TypeScript, Vite, and Tailwind CSS v4. Five separate hash-routed pages share a compact header, footer, and persistent light/dark theme. The supplied PDF informed the warm paper, coral accents, soft pastel cards, editorial typography, and personal scrapbook direction. Its example people, hobbies, and projects are references, not facts about this portfolio's owner.
 
 ## Run locally

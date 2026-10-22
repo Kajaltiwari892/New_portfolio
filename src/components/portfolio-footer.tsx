@@ -3,7 +3,6 @@ import { useReducedMotion } from "motion/react";
 import { Mark } from "@/components/portfolio-pieces";
 import { routeHref } from "@/lib/portfolio-router";
 import { profile } from "@/portfolio-content";
-import { projects } from "@/components/project-showcase";
 
 export function PortfolioFooter() {
   const reducedMotion = useReducedMotion();
@@ -19,11 +18,9 @@ export function PortfolioFooter() {
           </div>
         </div>
         <nav aria-label="Footer explore"><h3>Explore</h3><a href={routeHref("home")}>Home</a><a href={routeHref("about")}>About me</a><a href={routeHref("work")}>What I’ve done</a></nav>
-        <nav aria-label="Footer projects"><h3>On my GitHub</h3>{projects.map(project => <a key={project.id} href={project.code} target="_blank" rel="noreferrer">{project.name}<ArrowUpRight size={13} /></a>)}</nav>
         <nav aria-label="Footer connect"><h3>Say hello</h3><a href={routeHref("contact")}>Start a conversation <ArrowUpRight size={13} /></a>{profile.github && <a href={profile.github} target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={13} /></a>}{profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn <ArrowUpRight size={13} /></a>}<span className="footer-note">Always up for a good idea.</span></nav>
       </div>
       <div className="footer-bottomline"><span>© {new Date().getFullYear()} Kajal Tiwari</span><span>Made with care. And a lot of curiosity.</span><button onClick={() => { window.scrollTo({ top: 0, behavior: reducedMotion ? "instant" : "smooth" }); document.querySelector<HTMLElement>(".site-header .brand")?.focus({ preventScroll: true }); }}>Back to top <ArrowUp size={15} /></button></div>
-      <div className="footer-wordmark" aria-hidden="true">KAJAL<Mark /></div>
     </div>
   </footer>;
 }
