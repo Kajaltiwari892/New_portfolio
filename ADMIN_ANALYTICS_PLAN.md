@@ -14,7 +14,7 @@ A dashboard in the portfolio's cream, brown and olive theme, with:
 - Referring domains, device categories and eight recent pseudonymous visit journeys.
 - Today, 7, 30 (default), 90 days and custom ranges up to 90 days. All dates use India time.
 
-Counts begin after tracking is enabled and a visitor opts in. Historical traffic cannot be recovered. Visibility does not prove reading; link clicks do not prove downloads or activity on another website. Contact analytics never contain names, emails or message text.
+Counts begin automatically on the approved production hostname when tracking is enabled. There is no consent prompt. Historical traffic cannot be recovered. Visibility does not prove reading; link clicks do not prove downloads or activity on another website. Contact analytics never contain names, emails or message text. Random browser/session identifiers cannot reveal who a visitor is; contact-form details stay separate from analytics.
 
 ## Architecture
 
@@ -22,7 +22,7 @@ Keep React, TypeScript and Vite. Use **Firebase Authentication + Cloud Firestore
 
 ```mermaid
 flowchart LR
-  V[Visitor opts in] --> T[Allowlisted portfolio events]
+  V[Visitor opens portfolio] --> T[Allowlisted portfolio events]
   T --> A[Firebase anonymous identity]
   A --> R[Firestore validation and write limits]
   R --> D[(Firestore)]
@@ -40,7 +40,7 @@ Firebase Spark has free quotas, not unlimited usage. Do not enable Blaze or atta
 - Google sign-in requests identity only; no Gmail or Drive access.
 - Firestore reads require a Firebase-verified Google sign-in token with `email_verified = true` and the exact owner email. A browser flag alone cannot authorize reads.
 - Other Google users may authenticate but cannot read analytics; the UI rejects them.
-- Opted-in visitors receive a pseudonymous Firebase anonymous UID. They can write validated events, never read other events or edit/delete history.
+- Tracked visitors receive a pseudonymous Firebase anonymous UID automatically. They can write validated events, never read other events or edit/delete history.
 - Exact event fields, targets, devices, timestamp bounds and referrer hostname format are enforced by Firestore rules. Extra fields are rejected.
 - Event IDs are immutable; identical network retries do not create extra events.
 - Each anonymous UID has an atomic limit of 60 event writes per minute and 20 per batch. This is basic abuse protection: a determined caller can create new anonymous identities. Firebase App Check adds origin/app attestation when configured and enforced; it is not proof of a human visitor.
@@ -54,15 +54,15 @@ A section/card view requires at least half the element or half the viewport heig
 
 Only fixed page, section, project and action identifiers are collected. Referrers store hostnames, never paths, search queries or URL fragments. Device class uses viewport width. No geolocation, IP address, message text, full user agent, screen recording or fingerprint is collected by the app. Firebase and its attestation provider process network metadata under their own service policies.
 
-## Consent and exclusions
+## Automatic collection and exclusions
 
-Tracking is off until enabled in the public configuration and until a visitor chooses Allow analytics. No Firebase visitor identity is created before opt-in. The footer opens Analytics preferences to change the choice. Browser Do Not Track / Global Privacy Control disables tracking. Declining clears the local session and signs out the anonymous identity; it does not erase already stored events.
+The owner requested automatic basic activity tracking on 23 October 2026. The consent banner and footer preferences button are removed. Collection is enabled in the public configuration for the approved production hostname. Browser Do Not Track / Global Privacy Control disables tracking, and any earlier stored decline is still honored. A privacy preference detected during an in-flight identity request stops event delivery and signs out that anonymous identity. This change does not identify visitors or link their activity to contact-form details.
 
 Localhost, /admin, unapproved hostnames and a browser that has signed in as owner are excluded. Admin sign-in and reads still use Firebase, independently of visitor tracking.
 
 ## Cost, performance and retention
 
-The Firebase SDK loads separately from the normal portfolio bundle and only when an opted-in visitor sends events or the owner opens /admin. Events are batched; failures never break navigation, contact delivery or project links. The admin reads selected dates on load/refresh rather than continuously streaming.
+The Firebase SDK loads separately from the normal portfolio bundle when an eligible visitor sends events or the owner opens /admin. Events are batched; failures never break navigation, contact delivery or project links. The admin reads selected dates on load/refresh rather than continuously streaming.
 
 Reads paginate in batches of 500 with a 10,000-event safety limit; the dashboard asks for a smaller range instead of showing partial totals. Each refresh consumes Firestore read quota, and each event/budget transaction consumes write/read quota. Monitor the Firebase Usage page. If Spark quotas are exhausted, analytics may stop until quotas reset; the portfolio continues working.
 
@@ -74,9 +74,9 @@ Reads paginate in batches of 500 with a 10,000-event safety limit; the dashboard
 2. Enable Google and Anonymous Auth and authorize only the portfolio hostname and required local development origins.
 3. Create a Firestore Standard database in Mumbai (`asia-south1`) with production rules.
 4. Run model/contact/GitHub regression tests and the Firestore authorization tests; deploy the exact checked rules.
-5. Configure Firebase App Check for production, deploy its public site key, verify requests, then enforce it. Leave visitor tracking off until the backend setup is complete.
+5. Configure Firebase App Check for production and deploy its public site key in monitoring mode. Verify valid requests before enforcing it.
 6. Verify the owner login, real empty dashboard, responsive layouts and direct /admin route. Test another account and unauthenticated reads in the emulator.
-7. Enable consent-based collection for the exact production hostname and verify a controlled event round trip without sending a real contact email.
+7. Automatic collection is enabled for the exact production hostname. A controlled live event round trip remains to be verified, without sending a real contact email.
 8. Publish to the existing Site audience, then check its returned deployment status.
 
 ## Sources

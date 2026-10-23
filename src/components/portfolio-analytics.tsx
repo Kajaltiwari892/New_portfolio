@@ -1,15 +1,11 @@
-import { useEffect, useState } from "react";
-import { BarChart3, X } from "lucide-react";
-import { analyticsAvailable, consentChoice, flushAnalytics, privacyOptOut, setAnalyticsConsent, trackEvent, trackPage } from "@/lib/analytics";
+import { useEffect } from "react";
+import { flushAnalytics, trackEvent, trackPage } from "@/lib/analytics";
 import type { EventName, PublicPage } from "@/lib/analytics-model";
-import "@/analytics-consent.css";
 
 export function PortfolioAnalytics({ page }: { page: PublicPage }) {
   useEffect(() => {
     // Defer one tick so StrictMode's probe mount cannot emit a duplicate view.
     const start = setTimeout(() => trackPage(page), 0);
-    const consent = () => { trackPage(page); observer.disconnect(); observed.clear(); observe(); };
-    window.addEventListener("portfolio-consent-change", consent);
     const click = (event: MouseEvent) => {
       const element = (event.target as Element).closest<HTMLElement>("[data-analytics-event]");
       if (element) trackEvent(element.dataset.analyticsEvent as EventName, element.dataset.analyticsTarget ?? "");
@@ -41,19 +37,7 @@ export function PortfolioAnalytics({ page }: { page: PublicPage }) {
     mutations.observe(document.querySelector("main") ?? document.body, { childList: true, subtree: true });
     const visibility = () => { pending.forEach(clearTimeout); pending.clear(); if (document.visibilityState === "hidden") flushAnalytics(); else { observer.disconnect(); observed.clear(); observe(); } };
     document.addEventListener("visibilitychange", visibility);
-    return () => { clearTimeout(start); pending.forEach(clearTimeout); observer.disconnect(); mutations.disconnect(); document.removeEventListener("click", click); document.removeEventListener("visibilitychange", visibility); window.removeEventListener("portfolio-consent-change", consent); };
+    return () => { clearTimeout(start); pending.forEach(clearTimeout); observer.disconnect(); mutations.disconnect(); document.removeEventListener("click", click); document.removeEventListener("visibilitychange", visibility); };
   }, [page]);
-  return <AnalyticsConsent />;
-}
-function AnalyticsConsent() {
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    if (analyticsAvailable() && !consentChoice() && !privacyOptOut()) setOpen(true);
-    const show = () => setOpen(true);
-    window.addEventListener("portfolio-analytics-preferences", show);
-    return () => window.removeEventListener("portfolio-analytics-preferences", show);
-  }, []);
-  if (!open) return null;
-  const choose = (accept: boolean) => { setAnalyticsConsent(accept); setOpen(false); };
-  return <aside className="analytics-consent" aria-labelledby="analytics-consent-title"><BarChart3 size={20} /><div><h2 id="analytics-consent-title">Allow usage analytics?</h2><p>Optional stats help me understand which work you explore. Your message and contact details are never recorded.</p>{privacyOptOut() && <p>Your browser’s privacy preference keeps tracking off.</p>}<div className="analytics-consent-actions"><button type="button" onClick={() => choose(false)}>No thanks</button><button type="button" disabled={privacyOptOut() || !analyticsAvailable()} onClick={() => choose(true)}>Allow analytics</button></div></div><button className="analytics-consent-close" type="button" onClick={() => setOpen(false)} aria-label="Close analytics preferences"><X size={16} /></button></aside>;
+  return null;
 }

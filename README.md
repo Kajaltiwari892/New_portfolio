@@ -2,7 +2,7 @@
 
 ## Private portfolio analytics
 
-The new `/admin` route uses Firebase Google sign-in and Firestore rules restricted to `kanjal55567@gmail.com`. See [the implementation plan](ADMIN_ANALYTICS_PLAN.md) and [setup status and verification](FIREBASE_SETUP.md). Visitor collection stays disabled until the remaining App Check setup is complete. The public navbar's **Stats** page remains GitHub activity.
+The `/admin` route uses Firebase Google sign-in and Firestore rules restricted to `kanjal55567@gmail.com`. See [the implementation plan](ADMIN_ANALYTICS_PLAN.md) and [setup status and verification](FIREBASE_SETUP.md). Basic activity collection starts automatically on the approved production hostname, without a consent prompt. Browser privacy preferences, previous declines, localhost, and owner/admin visits remain excluded. App Check is registered in monitoring mode; hosted event delivery and enforcement remain unverified. The public navbar's **Stats** page remains GitHub activity.
 
 Run `node --test tests/analytics.test.mjs tests/analytics-collector.test.mjs tests/contact.test.mjs tests/github.test.mjs` for regression tests. `npm run test:rules` checks database authorization in an isolated demo emulator and requires Java 21+. `/tests/admin-ui.html` is a local-only visual fixture with explicitly synthetic data; it is not included in the production build.
 

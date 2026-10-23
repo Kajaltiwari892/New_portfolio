@@ -4,13 +4,11 @@ import { useReducedMotion } from "motion/react";
 import { Mark } from "@/components/portfolio-pieces";
 import { routeHref } from "@/lib/portfolio-router";
 import { profile } from "@/portfolio-content";
-import { analyticsAvailable, openAnalyticsPreferences } from "@/lib/analytics";
 
 export function PortfolioFooter() {
   const reducedMotion = useReducedMotion();
   return <footer className="portfolio-footer">
     <div className="footer-inner">
-      {analyticsAvailable() && <button className="footer-privacy" type="button" onClick={openAnalyticsPreferences}>Analytics preferences</button>}
       <div className="footer-directory">
         <div className="footer-person">
           <a href={routeHref("home")} className="brand"><Mark /><span>Kajal Tiwari.</span></a>

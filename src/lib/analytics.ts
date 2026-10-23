@@ -1,7 +1,8 @@
 import { validTarget, type AnalyticsEvent, type EventName, type PublicPage } from "./analytics-model";
 import publicConfig from "@/data/firebase-public-config.json";
 
-const CONSENT = "portfolio-analytics-consent";
+// Preserve a previous explicit decline; new visits need no consent interaction.
+const LEGACY_CONSENT = "portfolio-analytics-consent";
 const SESSION = "portfolio-analytics-session";
 let page: PublicPage = "home";
 let pageViewId = crypto.randomUUID();
@@ -11,7 +12,6 @@ let timer: ReturnType<typeof setTimeout> | undefined;
 let busy = false;
 let failures = 0;
 let storePromise: Promise<typeof import("./analytics-store")> | undefined;
-let identityTask: Promise<string | null> | undefined;
 const seen = new Set<string>();
 export function analyticsAvailable() {
   return (import.meta.env.VITE_ANALYTICS_ENABLED ?? String(publicConfig.analyticsEnabled)) === "true"
@@ -19,24 +19,7 @@ export function analyticsAvailable() {
     && !["localhost", "127.0.0.1"].includes(location.hostname);
 }
 export function privacyOptOut() { return navigator.doNotTrack === "1" || (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true; }
-export function consentChoice() { try { return localStorage.getItem(CONSENT); } catch { return "declined"; } }
-function allowed() { try { return analyticsAvailable() && !privacyOptOut() && consentChoice() === "accepted" && localStorage.getItem("portfolio-analytics-exclude") !== "true" && !location.pathname.startsWith("/admin"); } catch { return false; } }
-export function setAnalyticsConsent(accept: boolean) {
-  try { localStorage.setItem(CONSENT, accept ? "accepted" : "declined"); } catch { return; }
-  if (!accept) {
-    queue = []; seen.clear(); sessionId = "";
-    clearTimeout(timer); timer = undefined;
-    localStorage.removeItem(SESSION); localStorage.removeItem("portfolio-analytics-created");
-    // Declining before collection starts must not load Firebase or App Check.
-    const pendingIdentity = identityTask;
-    if (storePromise) void storePromise.then(async store => {
-      await pendingIdentity?.catch(() => {});
-      await store.forgetVisitor();
-    }).catch(() => {});
-  }
-  window.dispatchEvent(new Event("portfolio-consent-change"));
-}
-export function openAnalyticsPreferences() { window.dispatchEvent(new Event("portfolio-analytics-preferences")); }
+function allowed() { try { return analyticsAvailable() && !privacyOptOut() && localStorage.getItem(LEGACY_CONSENT) !== "declined" && localStorage.getItem("portfolio-analytics-exclude") !== "true" && !location.pathname.startsWith("/admin"); } catch { return false; } }
 function currentSession() {
   const now = Date.now();
   let saved: { id: string; last: number } | null = null;
@@ -53,21 +36,22 @@ function enqueue(name: EventName, target: string) {
 }
 async function flush() {
   timer = undefined;
-  if (busy || !allowed() || !queue.length) return;
+  if (busy) return;
+  if (!allowed()) { queue = []; return; }
+  if (!queue.length) return;
   busy = true;
   const batch = queue.splice(0, 20);
   try {
     const store = await (storePromise ??= import("./analytics-store").catch(reason => { storePromise = undefined; throw reason; }));
-    if (!allowed()) return;
-    identityTask = store.visitorIdentity();
-    const uid = await identityTask;
-    if (!uid || !allowed()) return;
+    if (!allowed()) { queue = []; return; }
+    const uid = await store.visitorIdentity();
+    if (!allowed()) { queue = []; if (uid) await store.forgetVisitor(); return; }
+    if (!uid) return;
     await store.storeEvents(batch.map(event => ({ ...event, visitorId: uid })));
     failures = 0;
   } catch {
     if (++failures <= 3 && allowed()) queue.unshift(...batch.filter(event => Date.now() - event.at < 10 * 60_000));
   } finally {
-    identityTask = undefined;
     busy = false;
     if (queue.length && allowed()) timer = setTimeout(() => void flush(), failures ? 60_000 : 5000);
   }
