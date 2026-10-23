@@ -6,7 +6,8 @@
 - Plan: **Spark**. No billing account, Blaze upgrade, Cloud Functions, or paid backups added.
 - Web app: `Portfolio web`, ID `1:681709275417:web:5ad42d52e86ac56c9d9d88`.
 - Authentication: Google and Anonymous enabled. Google support email is `kanjal55567@gmail.com`.
-- Authorized OAuth domains: localhost, the two default Firebase domains, and `motion-portfolio-studio.kuldeep-tiwari934919.chatgpt.site`.
+- Production hosting: https://kajal-portfolio-brown.vercel.app, under the owner's Vercel account `kajal-tiwaris-projects`.
+- Authorized OAuth domains: localhost, the two default Firebase domains, and `kajal-portfolio-brown.vercel.app`. The former ChatGPT Sites domain was removed.
 - Firestore: Standard edition, `(default)` database, `asia-south1` (Mumbai), initialized in production mode.
 - Tested `firestore.rules` published through the Firebase console. Reads require the owner's verified Google identity; visitor writes have strict fields and limits.
 
@@ -15,10 +16,14 @@
 1. Completed: Google sign-in as `kanjal55567@gmail.com` and a real Firestore dashboard read were verified at `http://localhost:5173/admin`. The login uses the owner email hint without forcing an account chooser.
 2. Completed: the owner approved Google Cloud terms and the reCAPTCHA Enterprise API was enabled without billing.
 3. Completed: the score-based Web key `Portfolio web App Check` is restricted to the exact production hostname and registered for the Firebase web app. Localhost was not added. Token TTL is one hour.
-4. The public site key is in `src/data/firebase-public-config.json` and has been deployed to the existing private Site. Verify valid App Check requests on that domain before enforcing Cloud Firestore. Hosted browser verification is pending because that Site requires its owner's separate ChatGPT login; no hosting access change was made. The implementation uses `ReCaptchaEnterpriseProvider`; the Classic provider is deprecated.
+4. The public site key is in `src/data/firebase-public-config.json`. Its allowed domain is now `kajal-portfolio-brown.vercel.app`; the former Sites domain was removed with domain verification still enabled. Verify valid App Check requests on Vercel before enforcing Cloud Firestore. The implementation uses `ReCaptchaEnterpriseProvider`; the Classic provider is deprecated.
 5. At the owner's request, `analyticsEnabled` is now `true`: basic collection starts automatically without a consent prompt. Approved-host, browser privacy, previous-decline, and owner exclusions still apply. Verify a controlled visitor event reaches Firestore and appears in the owner dashboard; this live check is pending.
 
-`analyticsEnabled` is now **true** in the production configuration. App Check is registered and remains in **monitoring mode, not enforcement**. The real owner dashboard previously read an empty database successfully. The automatic collector is tested with mocked storage; live hosted delivery has not been verified. The existing private hosting gate still prevents unrestricted public traffic. Do not claim a verified live event round trip until that check passes.
+`analyticsEnabled` is **true** only on the approved Vercel production hostname. App Check is registered and remains in **monitoring mode, not enforcement**. The real owner dashboard previously read an empty database successfully. The automatic collector is tested with mocked storage; live delivery on Vercel still needs verification. Do not claim a verified live event round trip until that check passes.
+
+## Sites removal
+
+The owner explicitly requested removal from ChatGPT Sites. The local Sites hosting manifest was removed and future deployments must use Vercel only. The old private deployment cannot yet be unpublished from the available session: the browser is signed into Kajal's ChatGPT account, while that deployment belongs to a different account, and the available Sites tools do not expose unpublish/delete. Removal is pending access to the hosting owner account. Removing local configuration does not delete the existing hosted copy.
 
 ## Local development
 
@@ -50,7 +55,7 @@ npm run test:rules
 ## Operations
 
 - Bookmark the deployed `/admin`; keep it out of the public navbar.
-- The Site currently has owner-private hosting access. This is distinct from Firebase's owner-only dashboard authorization. Public visitors cannot open a privately hosted portfolio.
+- The portfolio is hosted on Vercel; `/admin` data remains restricted to the owner's verified Google account by Firebase rules. Vercel preview deployment URLs are not approved analytics hosts.
 - Monitor Firestore Usage and Auth usage. Spark has quotas and may reject requests after exhaustion. The main portfolio should continue working.
 - Fraud Defense Essentials has a free monthly assessment quota; without billing, excess requests fail instead of incurring charges. See [billing behavior](https://docs.cloud.google.com/recaptcha/docs/billing-information).
 - Raw event retention is manual. A 90-day query limit does not delete old events; no TTL or scheduled cleanup is enabled.

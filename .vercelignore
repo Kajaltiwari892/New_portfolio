@@ -1,0 +1,13 @@
+.git
+.openai
+.sites-local
+.env*
+node_modules
+dist
+tests
+*.tar.gz
+*-debug.log
+*.md
+firestore.rules
+firestore.indexes.json
+firebase.json

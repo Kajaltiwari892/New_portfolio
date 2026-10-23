@@ -1,5 +1,9 @@
 # Folio personal portfolio
 
+## Hosting
+
+Deploy this portfolio only to the owner's Vercel account, `kajal-tiwaris-projects`, using `Kajaltiwari892/New_portfolio`. Production: https://kajal-portfolio-brown.vercel.app. The owner explicitly requested removal from ChatGPT Sites; do not recreate or publish a Sites deployment. `vercel.json` configures the Vite build and direct `/admin` access. Firebase continues to provide authentication and the analytics database independently of hosting.
+
 ## Private portfolio analytics
 
 The `/admin` route uses Firebase Google sign-in and Firestore rules restricted to `kanjal55567@gmail.com`. See [the implementation plan](ADMIN_ANALYTICS_PLAN.md) and [setup status and verification](FIREBASE_SETUP.md). Basic activity collection starts automatically on the approved production hostname, without a consent prompt. Browser privacy preferences, previous declines, localhost, and owner/admin visits remain excluded. App Check is registered in monitoring mode; hosted event delivery and enforcement remain unverified. The public navbar's **Stats** page remains GitHub activity.
