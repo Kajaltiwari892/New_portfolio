@@ -9,9 +9,12 @@ import { profile } from "@/portfolio-content";
 const formatDate = (value: string, month: "short" | "long" = "short") => new Date(value).toLocaleDateString("en-GB", { day: "numeric", month, year: "numeric", timeZone: "UTC" });
 const languageColors: Record<string, string> = { JavaScript: "#b69a54", TypeScript: "#667b67", HTML: "#b37559", CSS: "#9181a0", Python: "#66818c" };
 const languageColor = (name: string) => languageColors[name] ?? "#8e8170";
+// Owner-confirmed on 2026-10-23, including private repositories.
+// Keep this separate from the public API count so refreshes preserve the total.
+const totalRepositories = 48;
 
 function ContributionCalendar() {
-  const [periodId, setPeriodId] = useState("current");
+  const [periodId, setPeriodId] = useState("last12months");
   const activity = snapshot.contributionPeriods.find(period => period.id === periodId) ?? snapshot.contributions;
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const selectedDay = activity.days.find(day => day.date === selectedDate);
@@ -52,7 +55,7 @@ export function GitHubStatsPage() {
   const summary = summarizeRepositories(overview.repositories);
   const languageTotal = summary.languages.reduce((sum, language) => sum + language.count, 0);
   const metrics = [
-    { label: "Public repositories", value: overview.profile.public_repos, icon: BookOpen, href: `${profile.github}?tab=repositories&type=public`, note: "Private repositories excluded" },
+    { label: "Repositories", value: totalRepositories, icon: BookOpen, href: `${profile.github}?tab=repositories`, note: "Public & private" },
     { label: "Stars", value: overview.starredRepositories, icon: Star, href: `${profile.github}?tab=stars`, note: "Repositories I’ve starred" },
     { label: "Followers", value: overview.profile.followers, icon: Users },
     { label: "Primary languages", value: summary.languages.length, icon: Code2 },
@@ -60,7 +63,7 @@ export function GitHubStatsPage() {
   return <div id="github" className="github-page">
     <a href={routeHref("home")} className="github-back"><ArrowLeft size={14} />Back to portfolio</a>
     <header className="github-page-heading"><div><p className="github-eyebrow"><GitHubIcon size={16} />GitHub / In the open</p><h1 id="github-heading" tabIndex={-1}>Behind <em>the builds.</em></h1><p>A look at my code, contributions, and what I’m working on.</p></div></header>
-    <div className="github-stats-toolbar"><div className="github-stats-meta" role="status"><span className={status === "live" ? "github-status-dot is-live" : "github-status-dot"} />{status === "live" ? `Profile stats updated ${formatDate(overview.updatedAt)}` : status === "updating" ? "Updating profile stats…" : `Saved profile stats · ${formatDate(overview.updatedAt)}`}</div><button className="github-refresh" type="button" onClick={() => setRefreshCount(count => count + 1)} disabled={status === "updating"} aria-label="Refresh profile stats"><RefreshCw size={12} />Refresh</button></div>
+    <div className="github-stats-toolbar"><div className="github-stats-meta" role="status"><span className={status === "live" ? "github-status-dot is-live" : "github-status-dot"} />{status === "live" ? `Public stats updated ${formatDate(overview.updatedAt)}` : status === "updating" ? "Updating public stats…" : `Saved public stats · ${formatDate(overview.updatedAt)}`}</div><button className="github-refresh" type="button" onClick={() => setRefreshCount(count => count + 1)} disabled={status === "updating"} aria-label="Refresh profile stats"><RefreshCw size={12} />Refresh</button></div>
     <dl className="github-metrics">{metrics.map(metric => <div className="github-metric" key={metric.label}><dt><metric.icon size={18} /><span>{metric.label}</span></dt><dd>{metric.href ? <a href={metric.href} target="_blank" rel="noreferrer" aria-label={`${metric.value} ${metric.label} on GitHub`}>{metric.value.toLocaleString()}<ArrowUpRight size={17} /></a> : metric.value.toLocaleString()}</dd>{metric.note && <dd className="github-metric-note">{metric.note}</dd>}</div>)}</dl>
     <ContributionCalendar />
     <div className="github-details-grid">
