@@ -26,3 +26,27 @@ test('section/project visibility counts visits; clicks and contact outcomes stay
   assert.deepEqual(result.contact,{started:1,accepted:1,failed:1});
   assert.equal(result.resume,1); assert.equal(result.views,1);
 });
+
+test('repeat opens and resume clicks count one browser, with actions separate',()=>{
+  const rows=Array.from({length:5},(_,i)=>row(`page-${i}`,start+i));
+  rows.push(...Array.from({length:5},(_,i)=>row(`resume-${i}`,start+100+i,{name:'resume_open',target:'resume'})));
+  const result=summarizeAnalytics(rows,'2026-10-22','2026-10-22');
+  assert.equal(result.visitors,1);assert.equal(result.visits,1);assert.equal(result.views,5);assert.equal(result.resume,1);assert.equal(result.resumeClicks,5);
+});
+test('every metric and journey respects browser exclusions and the exact clean-start time',()=>{
+  const rows=[row('old',start),row('keep',start+100,{visitorId:'real',sessionId:'real-session'}),row('test',start+200,{name:'resume_open',target:'resume'}),row('test-send',start+201,{name:'contact_submit_accepted',target:'contact'})];
+  const result=summarizeAnalytics(rows,'2026-10-22','2026-10-22',{cleanFrom:start+50,excludedVisitorIds:['visitor-a']});
+  assert.equal(result.visitors,1);assert.equal(result.visits,1);assert.equal(result.views,1);assert.equal(result.resume,0);assert.equal(result.contact.accepted,0);
+  assert.equal(result.journeys.length,1);assert.equal(result.journeys[0].visitorId,'real');assert.equal(result.daily[0].views,1);
+  assert.equal(result.devices.reduce((sum,r)=>sum+r.count,0),1);assert.equal(result.referrers.reduce((sum,r)=>sum+r.count,0),1);
+  assert.equal(summarizeAnalytics(rows,'2026-10-22','2026-10-22').visitors,2);
+});
+test('source and device distributions count each visit once and normalize legacy domains',()=>{
+  const result=summarizeAnalytics([row('a',start,{referrer:'m.facebook.com'}),row('b',start+1,{referrer:'',device:'desktop'}),row('c',start+2,{sessionId:'other-session',source:'Instagram',sourceKind:'tagged'}),row('d',start+3,{sessionId:'last-session',name:'resume_open',target:'resume'})],'2026-10-22','2026-10-22');
+  assert.equal(result.referrers.length,3);assert.equal(result.referrers.find(r=>r.label==='Facebook').count,1);
+  assert.equal(result.referrers.reduce((s,r)=>s+r.count,0),result.visits);assert.equal(result.devices.reduce((s,r)=>s+r.count,0),result.visits);
+});
+test('daily visitors include an active returning tab without inventing a page load',()=>{
+  const result=summarizeAnalytics([row('resume',start,{name:'resume_open',target:'resume'})],'2026-10-22','2026-10-22');
+  assert.equal(result.daily[0].visitors,1);assert.equal(result.daily[0].views,0);assert.equal(result.views,0);assert.equal(result.visits,1);
+});

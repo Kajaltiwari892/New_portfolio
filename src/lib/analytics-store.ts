@@ -1,7 +1,25 @@
-import { collection, doc, getDocs, limit, orderBy, query, runTransaction, serverTimestamp, startAfter, where, type QueryDocumentSnapshot } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, limit, orderBy, query, runTransaction, serverTimestamp, setDoc, startAfter, where, type QueryDocumentSnapshot } from "firebase/firestore";
 import { signInAnonymously, signOut } from "firebase/auth";
 import { auth, db } from "./firebase";
-import { dateBounds, type AnalyticsEvent } from "./analytics-model";
+import { dateBounds, type AnalyticsEvent, type ReportSettings } from "./analytics-model";
+
+export async function loadReportSettings(): Promise<ReportSettings> {
+  if (!db) throw new Error("Analytics is not connected yet.");
+  const [settings, exclusions] = await Promise.all([getDoc(doc(db, "analytics_settings", "reporting")), getDocs(collection(db, "analytics_exclusions"))]);
+  return { cleanFrom: settings.data()?.cleanFrom ?? null, excludedVisitorIds: exclusions.docs.map(d => d.id) };
+}
+export async function startCleanTracking() {
+  if (!db) throw new Error("Analytics is not connected yet.");
+  const cleanFrom = Date.now();
+  await setDoc(doc(db, "analytics_settings", "reporting"), { cleanFrom, updatedAt: serverTimestamp() });
+  return cleanFrom;
+}
+export async function setVisitorExcluded(visitorId: string, excluded: boolean) {
+  if (!db || !/^[a-zA-Z0-9_-]{1,128}$/.test(visitorId)) throw new Error("Invalid browser identifier.");
+  const ref = doc(db, "analytics_exclusions", visitorId);
+  if (excluded) await setDoc(ref, { excludedAt: serverTimestamp() });
+  else await deleteDoc(ref);
+}
 
 export async function visitorIdentity() {
   if (!auth) return null;

@@ -54,6 +54,13 @@ npm run test:rules
 
 ## Operations
 
+Counting update, 23 October 2026: the live rules accept bounded optional `source`/`sourceKind` fields while retaining legacy events. `analytics_settings/reporting` and `analytics_exclusions/{visitorId}` are readable/writable only by the verified owner; source metadata and owner controls passed 11 emulator tests. Event deletion remains denied. No billing change was made.
+
+- The private phone/browser setup link is `https://kajal-portfolio-brown.vercel.app/?analytics=off`. It sets local exclusion before React starts, removes the setup query parameter and confirms the result. It never grants admin access. Opening it in one browser cannot exclude another browser or device.
+- `/admin` has a reversible browser-ID exclusion list and a clean-start filter. The start time remains unset until the owner excludes their own devices and clicks **Start clean tracking now**. Existing records are preserved; no unknown past visitor is automatically classified as a test.
+- Resume visitors count each browser once per selected range; total clicks remain separate. A post-inactivity action no longer generates a synthetic page view. Source and device distributions assign each session exactly once. New session source is tagged-link first, browser referrer second, Direct / unknown otherwise.
+- The contact panel counts visits that focus a field, accepted submission attempts, and failed attempts. It contains no contact message text or sender identity.
+
 - Bookmark the deployed `/admin`; keep it out of the public navbar.
 - The portfolio is hosted on Vercel; `/admin` data remains restricted to the owner's verified Google account by Firebase rules. Vercel preview deployment URLs are not approved analytics hosts.
 - Monitor Firestore Usage and Auth usage. Spark has quotas and may reject requests after exhaustion. The main portfolio should continue working.

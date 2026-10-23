@@ -20,13 +20,32 @@ service cloud.firestore {
     function validEvent(eventId) {
       let d = request.resource.data;
       let budget = getAfter(/databases/$(database)/documents/analytics_writers/$(request.auth.uid)).data;
-      return d.keys().hasOnly(['v', 'id', 'visitorId', 'sessionId', 'pageViewId', 'name', 'target', 'page', 'at', 'device', 'referrer'])
+      return d.keys().hasOnly(['v', 'id', 'visitorId', 'sessionId', 'pageViewId', 'name', 'target', 'page', 'at', 'device', 'referrer', 'source', 'sourceKind'])
         && d.v == 1 && d.id == eventId && id(d.id) && id(d.sessionId) && id(d.pageViewId)
         && d.visitorId == request.auth.uid && d.page in ['home', 'stats']
         && d.at is int && d.at <= request.time.toMillis() + 60000 && d.at >= request.time.toMillis() - 900000
         && d.device in ['mobile', 'tablet', 'desktop']
         && d.referrer is string && d.referrer.size() <= 200 && d.referrer.matches('^[a-zA-Z0-9.-]*$')
+        && ((!d.keys().hasAny(['source', 'sourceKind'])) || (d.keys().hasAll(['source', 'sourceKind'])
+          && ((d.sourceKind == 'tagged' && d.source in ['Instagram', 'Facebook', 'LinkedIn', 'GitHub', 'Google'])
+            || (d.sourceKind == 'referrer' && d.referrer.size() > 0 && d.source in ['Instagram', 'Facebook', 'LinkedIn', 'GitHub', 'Google', 'Other website'])
+            || (d.sourceKind == 'unknown' && d.source == 'Direct / unknown' && d.referrer == ''))))
         && targetAllowed(d) && budget.updatedAt == request.time && eventId in budget.ids;
+    }
+    match /analytics_settings/reporting {
+      allow read: if owner();
+      allow create, update: if owner()
+        && request.resource.data.keys().hasOnly(['cleanFrom', 'updatedAt'])
+        && request.resource.data.cleanFrom is int
+        && request.resource.data.cleanFrom >= 0
+        && request.resource.data.cleanFrom <= request.time.toMillis() + 60000
+        && request.resource.data.updatedAt == request.time;
+    }
+    match /analytics_exclusions/{uid} {
+      allow read, delete: if owner();
+      allow create, update: if owner() && uid.matches('^[a-zA-Z0-9_-]{1,128}$')
+        && request.resource.data.keys().hasOnly(['excludedAt'])
+        && request.resource.data.excludedAt == request.time;
     }
     match /analytics_events/{eventId} {
       allow read: if owner();

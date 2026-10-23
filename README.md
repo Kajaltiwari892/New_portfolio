@@ -8,7 +8,9 @@ Deploy this portfolio only to the owner's Vercel account, `kajal-tiwaris-project
 
 The `/admin` route uses Firebase Google sign-in and Firestore rules restricted to `kanjal55567@gmail.com`. See [the implementation plan](ADMIN_ANALYTICS_PLAN.md) and [setup status and verification](FIREBASE_SETUP.md). Basic activity collection starts automatically on the approved production hostname, without a consent prompt. Browser privacy preferences, previous declines, localhost, and owner/admin visits remain excluded. Owner login and visitor-to-dashboard delivery were verified on Vercel; App Check remains in monitoring mode, not enforcement. The public navbar's **Stats** page remains GitHub activity.
 
-Run `node --test tests/analytics.test.mjs tests/analytics-collector.test.mjs tests/contact.test.mjs tests/github.test.mjs` for regression tests. `npm run test:rules` checks database authorization in an isolated demo emulator and requires Java 21+. `/tests/admin-ui.html` is a local-only visual fixture with explicitly synthetic data; it is not included in the production build.
+Run `node --test tests/analytics.test.mjs tests/analytics-collector.test.mjs tests/analytics-source.test.mjs tests/analytics-preferences.test.mjs tests/contact.test.mjs tests/github.test.mjs` for regression tests. `npm run test:rules` checks database authorization in an isolated demo emulator and requires Java 21+. `/tests/admin-ui.html` is a local-only visual fixture with explicitly synthetic data; it is not included in the production build.
+
+Admin counts estimate unique browsers, separate repeat sessions/page views, and count resume visitors once with total clicks shown separately. Owner controls include a private `?analytics=off` setup link for each phone/browser, reversible exclusions of known test browser IDs, and a clean-start date filter that preserves earlier history. Sources are grouped from allowlisted `utm_source` tags or the browser referrer; missing information remains Direct / unknown. No visitor Google sign-in or identity collection is added.
 
 ## Contact form and resume
 

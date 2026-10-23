@@ -5,22 +5,26 @@ import { readFileSync } from 'node:fs';
 import { webcrypto } from 'node:crypto';
 import ts from 'typescript';
 
-function harness({ hostname='portfolio.example', path='/', dnt='0', gpc=false, exclude=false, enabled=true, legacyDecline=false, storageBlocked=false, identityGate }={}) {
-  const storage=new Map(exclude ? [['portfolio-analytics-exclude','true']] : []);
+function harness({ hostname='portfolio.example', path='/', search='', locks, sharedStorage, dnt='0', gpc=false, exclude=false, enabled=true, legacyDecline=false, storageBlocked=false, identityGate }={}) {
+  const storage=sharedStorage ?? new Map(exclude ? [['portfolio-analytics-exclude','true']] : []);
   if(legacyDecline) storage.set('portfolio-analytics-consent','declined');
   const sent=[], timers=new Map(); let sdkLoads=0, identities=0, forgotten=0, nextTimer=0, now=Date.now();
   const model={exports:{}};
   const compile=source=>ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;
-  vm.runInNewContext(compile(readFileSync(new URL('../src/lib/analytics-model.ts',import.meta.url),'utf8')),{exports:model.exports,Date,Map,Set,Object});
+  const sourceModule={exports:{}};
+  vm.runInNewContext(compile(readFileSync(new URL('../src/lib/analytics-source.ts',import.meta.url),'utf8')),{exports:sourceModule.exports,URL,URLSearchParams});
+  vm.runInNewContext(compile(readFileSync(new URL('../src/lib/analytics-model.ts',import.meta.url),'utf8')),{exports:model.exports,Date,Map,Set,Object,require:()=>sourceModule.exports});
   const module={exports:{}};
   const fakeStore={visitorIdentity:async()=>{identities++; await identityGate; return 'anonymous-test-visitor';},storeEvents:async rows=>sent.push(...rows),forgetVisitor:async()=>{forgotten++;}};
   const source=readFileSync(new URL('../src/lib/analytics.ts',import.meta.url),'utf8').replaceAll('import.meta.env','({})');
   const sandbox={exports:module.exports,require:name=> {
     if(name==='./analytics-model') return model.exports;
+    if(name==='./analytics-source') return sourceModule.exports;
+    if(name==='./analytics-preferences') return {browserIsExcluded:()=>storage.get('portfolio-analytics-exclude')==='true'};
     if(name==='@/data/firebase-public-config.json') return {default:{analyticsEnabled:enabled,analyticsHosts:['portfolio.example']}};
     if(name==='./analytics-store') {sdkLoads++; return fakeStore;}
     throw new Error(name);
-  },crypto:webcrypto,window:new EventTarget(),Event,location:{hostname,pathname:path},navigator:{doNotTrack:dnt,globalPrivacyControl:gpc},document:{referrer:'https://github.com/a/private-path?email=secret'},innerWidth:390,URL,
+  },crypto:webcrypto,window:new EventTarget(),Event,location:{hostname,pathname:path,search},navigator:{locks,doNotTrack:dnt,globalPrivacyControl:gpc},document:{referrer:'https://github.com/a/private-path?email=secret'},innerWidth:390,URL,
   localStorage:{getItem:key=>{if(storageBlocked) throw new Error('Storage blocked');return storage.get(key)??null;},setItem:(key,value)=>storage.set(key,value),removeItem:key=>storage.delete(key)},
   Date:class extends Date {static now(){return now;}},setTimeout:fn=>{const id=++nextTimer;timers.set(id,fn);return id;},clearTimeout:id=>timers.delete(id)};
   vm.runInNewContext(compile(source),sandbox);
@@ -43,7 +47,7 @@ test('a new visit records automatically without a consent choice and only sends 
   assert.equal(h.storage.has('portfolio-analytics-consent'),false);
   assert.equal(h.identities,1);assert.equal(h.sent.length,2);
   assert.equal(h.sent[0].referrer,'github.com');assert.equal(h.sent[0].device,'mobile');
-  assert.deepEqual(Object.keys(h.sent[0]).sort(),['v','id','visitorId','sessionId','pageViewId','name','target','page','at','device','referrer'].sort());
+  assert.deepEqual(Object.keys(h.sent[0]).sort(),['v','id','visitorId','sessionId','pageViewId','name','target','page','at','device','referrer','source','sourceKind'].sort());
 });
 test('browser privacy, earlier declines, blocked storage, owner, local hosts and admin never emit events',async()=>{
   for(const options of [{dnt:'1'},{gpc:true},{legacyDecline:true},{storageBlocked:true},{exclude:true},{hostname:'localhost'},{hostname:'127.0.0.1'},{hostname:'unknown.example'},{path:'/admin'},{path:'/admin/'}]) {
@@ -59,5 +63,25 @@ test('visible sections deduplicate per page view and visits expire after 30 minu
   const h=harness();h.api.trackPage('home');h.api.trackEvent('section_view','work',true);h.api.trackEvent('section_view','work',true);h.api.trackEvent('project_view','unknown-project',true);await h.flush();
   assert.equal(h.sent.length,2);const session=h.sent[0].sessionId;
   h.advance(31*60_000);h.api.trackEvent('resume_open','resume');await h.flush();
-  assert.equal(h.sent.length,4);assert.equal(h.sent[2].name,'page_view');assert.notEqual(h.sent[2].sessionId,session);
+  assert.equal(h.sent.length,3);assert.equal(h.sent[2].name,'resume_open');assert.notEqual(h.sent[2].sessionId,session);
+});
+
+test('resume taps do not create page views, even after inactivity',async()=>{
+  const h=harness();h.api.trackPage('home');h.api.trackEvent('resume_open','resume');h.api.trackEvent('resume_open','resume');await h.flush();
+  h.advance(31*60_000);h.api.trackEvent('resume_open','resume');await h.flush();
+  assert.equal(h.sent.filter(e=>e.name==='page_view').length,1);assert.equal(h.sent.filter(e=>e.name==='resume_open').length,3);
+});
+test('session attribution survives internal navigation but resets on a later visit',async()=>{
+  const h=harness({search:'?utm_source=instagram&secret=email@example.com'});h.api.trackPage('home');await h.flush();
+  h.sandbox.location.search='';h.sandbox.document.referrer='https://portfolio.example/';h.api.trackPage('stats');await h.flush();
+  assert.equal(h.sent[1].source,'Instagram');assert.equal(h.sent[1].sourceKind,'tagged');
+  assert.equal(JSON.stringify(h.sent).includes('email@example.com'),false);
+  h.advance(31*60_000);h.api.trackPage('home');await h.flush();assert.equal(h.sent[2].source,'Direct / unknown');
+});
+test('serialized tab startup shares a session and retains the page at the time of each event',async()=>{
+  let tail=Promise.resolve(); const locks={request:(_name,fn)=>{tail=tail.then(fn);return tail;}};
+  const sharedStorage=new Map(), a=harness({locks,sharedStorage}), b=harness({locks,sharedStorage});
+  a.api.trackPage('home');a.api.trackPage('stats');b.api.trackPage('home');await tail;await a.flush();await b.flush();
+  assert.equal(a.sent[0].sessionId,b.sent[0].sessionId);assert.equal(a.sent[0].page,'home');assert.equal(a.sent[1].page,'stats');
+  assert.notEqual(a.sent[0].pageViewId,a.sent[1].pageViewId);
 });

@@ -51,3 +51,29 @@ test('expired write window may reset; other visitors cannot access its budget', 
   const other=env.authenticatedContext('different-user',{firebase:{sign_in_provider:'anonymous'}}).firestore();
   await assertFails(getDoc(doc(other,'analytics_writers',uid)));
 });
+
+test('accepts bounded source metadata and retains legacy event compatibility',async()=>{
+  await assertSucceeds(send(anonymous(),[event({source:'Instagram',sourceKind:'tagged'}),event({source:'Facebook',sourceKind:'referrer',referrer:'m.facebook.com'}),event({source:'Direct / unknown',sourceKind:'unknown',referrer:''}),event()]));
+});
+test('rejects personal campaign values, partial metadata and inconsistent source evidence',async()=>{
+  for(const changes of [{source:'name@example.com',sourceKind:'tagged'},{source:'Instagram'},{sourceKind:'tagged'},{source:'Direct / unknown',sourceKind:'tagged'},{source:'Facebook',sourceKind:'referrer',referrer:''},{source:'Direct / unknown',sourceKind:'unknown',referrer:'facebook.com'},{source:'Instagram',sourceKind:'tagged',utm_campaign:'private text'}]) await assertFails(send(anonymous(),[event(changes)]));
+});
+test('only the owner can manage report settings and reversible exclusions',async()=>{
+  const owner=account();
+  await assertSucceeds(setDoc(doc(owner,'analytics_settings','reporting'),{cleanFrom:Date.now(),updatedAt:serverTimestamp()}));
+  await assertSucceeds(setDoc(doc(owner,'analytics_exclusions',uid),{excludedAt:serverTimestamp()}));
+  await assertSucceeds(getDocs(collection(owner,'analytics_exclusions')));
+  await assertSucceeds(deleteDoc(doc(owner,'analytics_exclusions',uid)));
+  for(const db of [anonymous(),account('other@example.com'),account(undefined,false),env.unauthenticatedContext().firestore()]) {
+    await assertFails(getDoc(doc(db,'analytics_settings','reporting')));
+    await assertFails(setDoc(doc(db,'analytics_settings','reporting'),{cleanFrom:Date.now(),updatedAt:serverTimestamp()}));
+    await assertFails(getDocs(collection(db,'analytics_exclusions')));
+    await assertFails(setDoc(doc(db,'analytics_exclusions',uid),{excludedAt:serverTimestamp()}));
+    await assertFails(deleteDoc(doc(db,'analytics_exclusions',uid)));
+  }
+});
+test('settings cannot store arbitrary personal fields or change event history',async()=>{
+  await assertFails(setDoc(doc(account(),'analytics_settings','reporting'),{cleanFrom:-1,updatedAt:serverTimestamp()}));
+  await assertFails(setDoc(doc(account(),'analytics_settings','reporting'),{cleanFrom:Date.now(),updatedAt:serverTimestamp(),email:'private@example.com'}));
+  await assertFails(setDoc(doc(account(),'analytics_exclusions',uid),{excludedAt:serverTimestamp(),email:'private@example.com'}));
+});
