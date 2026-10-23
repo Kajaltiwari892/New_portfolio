@@ -5,30 +5,31 @@ import { ContactDeliveryError, contactEndpoint, sendContactMessage } from "../sr
 const message = { name: "Visitor", email: "visitor@example.com", message: "Hello Kajal", _honey: "" };
 const jsonResponse = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 
-test("sends the visitor's fields to the same-origin backend", async () => {
+test("sends documented JSON with the activated production URL and reply-to", async () => {
   let request;
   await sendContactMessage(message, { fetchRequest: async (url, options) => { request = { url, options }; return jsonResponse({ success: true }); } });
   assert.equal(request.url, contactEndpoint);
-  assert.equal(request.url, "/api/contact");
+  assert.equal(request.url, "https://formsubmit.co/ajax/5f600185da3402c8f5c5b0090ac2bf7a");
   assert.equal(request.options.method, "POST");
   assert.equal(request.options.headers["Content-Type"], "application/json");
   const body = JSON.parse(request.options.body);
   assert.equal(body.name, message.name);
   assert.equal(body.email, message.email);
   assert.equal(body.message, message.message);
-  assert.equal(body._replyto, undefined);
-  assert.equal(body._url, undefined);
+  assert.equal(body._replyto, message.email);
+  assert.equal(body._url, "https://kajal-portfolio-brown.vercel.app/");
   assert.equal(body._honey, "");
   assert.equal(body._next, undefined);
   assert.equal(body._captcha, undefined);
 });
 
-test("accepts a boolean success receipt", async () => {
+test("accepts boolean and string success receipts", async () => {
   await sendContactMessage(message, { fetchRequest: async () => jsonResponse({ success: true }) });
+  await sendContactMessage(message, { fetchRequest: async () => jsonResponse({ success: "true" }) });
 });
 
 test("does not mistake string false or an unknown receipt for success", async () => {
-  for (const receipt of [{ success: "false" }, { success: "true" }, { success: false }, {}, null, { success: 1 }]) {
+  for (const receipt of [{ success: "false" }, { success: false }, {}, null, { success: 1 }]) {
     await assert.rejects(sendContactMessage(message, { fetchRequest: async () => jsonResponse(receipt) }), ContactDeliveryError);
   }
 });
@@ -41,7 +42,7 @@ test("HTTP errors are never reported as success", async () => {
   await assert.rejects(sendContactMessage(message, { fetchRequest: async () => jsonResponse({ success: true }, 503) }), ContactDeliveryError);
 });
 
-test("shows actionable backend errors without losing the draft", async () => {
+test("shows a useful rate-limit error without losing the draft", async () => {
   await assert.rejects(sendContactMessage(message, { fetchRequest: async () => jsonResponse({ success: false, message: "Please wait a minute. Your message is still here." }, 429) }), /Please wait a minute/);
   assert.equal(message.message, "Hello Kajal");
 });

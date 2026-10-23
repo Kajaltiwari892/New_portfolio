@@ -1,5 +1,5 @@
-// Same-origin delivery: mobile browsers only need to reach the portfolio.
-export const contactEndpoint = "/api/contact";
+// FormSubmit's documented browser API. Server-to-server requests are rejected.
+export const contactEndpoint = "https://formsubmit.co/ajax/5f600185da3402c8f5c5b0090ac2bf7a";
 
 export type ContactMessage = {
   name: string;
@@ -26,7 +26,17 @@ export async function sendContactMessage(
     const response = await fetchRequest(contactEndpoint, {
       method: "POST",
       headers: { Accept: "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify(message),
+      body: JSON.stringify({
+        name: message.name,
+        email: message.email,
+        message: message.message,
+        _honey: message._honey,
+        _replyto: message.email,
+        _subject: "New message from Kajal’s portfolio",
+        _template: "table",
+        // Use the activated form URL, including for localhost and hash navigation.
+        _url: "https://kajal-portfolio-brown.vercel.app/",
+      }),
       signal: controller.signal,
     });
     const result: unknown = await response.json();
@@ -38,8 +48,10 @@ export async function sendContactMessage(
     if (/activat|confirm.{0,30}(email|form)|check your email/i.test(providerMessage)) {
       throw new ContactDeliveryError("Messaging is temporarily unavailable. Please email me directly. Your message is still here.");
     }
-    if (!response.ok || receipt.success !== true) {
-      throw new ContactDeliveryError(providerMessage || "I couldn’t send your message. Your message is still here—please try again shortly.");
+    if (!response.ok || (receipt.success !== true && receipt.success !== "true")) {
+      throw new ContactDeliveryError(response.status === 429
+        ? "Please wait a minute before sending again. Your message is still here."
+        : "I couldn’t send your message. Your message is still here—please try again shortly.");
     }
   } catch (error) {
     if (error instanceof ContactDeliveryError) throw error;

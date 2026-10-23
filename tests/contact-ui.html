@@ -12,7 +12,7 @@
       const originalFetch = window.fetch.bind(window);
       let count = 0;
       window.fetch = async (url, options) => {
-        if (String(url) !== '/api/contact') return originalFetch(url, options);
+        if (!String(url).startsWith('https://formsubmit.co/ajax/')) return originalFetch(url, options);
         const mode = document.querySelector('#test-response').value;
         document.querySelector('#request-count').textContent = `Requests: ${++count}`;
         await new Promise(resolve => setTimeout(resolve, 1400));
