@@ -17,9 +17,9 @@
 2. Completed: the owner approved Google Cloud terms and the reCAPTCHA Enterprise API was enabled without billing.
 3. Completed: the score-based Web key `Portfolio web App Check` is restricted to the exact production hostname and registered for the Firebase web app. Localhost was not added. Token TTL is one hour.
 4. The public site key is in `src/data/firebase-public-config.json`. Its allowed domain is now `kajal-portfolio-brown.vercel.app`; the former Sites domain was removed with domain verification still enabled. Verify valid App Check requests on Vercel before enforcing Cloud Firestore. The implementation uses `ReCaptchaEnterpriseProvider`; the Classic provider is deprecated.
-5. At the owner's request, `analyticsEnabled` is now `true`: basic collection starts automatically without a consent prompt. Approved-host, browser privacy, previous-decline, and owner exclusions still apply. Verify a controlled visitor event reaches Firestore and appears in the owner dashboard; this live check is pending.
+5. At the owner's request, `analyticsEnabled` is `true`: basic collection starts automatically without a consent prompt. Approved-host, browser privacy, previous-decline, and owner exclusions still apply. A real visit to the Vercel home page and About section appeared in the owner dashboard on 23 October 2026. Verification visits are included in the initial counts.
 
-`analyticsEnabled` is **true** only on the approved Vercel production hostname. App Check is registered and remains in **monitoring mode, not enforcement**. The real owner dashboard previously read an empty database successfully. The automatic collector is tested with mocked storage; live delivery on Vercel still needs verification. Do not claim a verified live event round trip until that check passes.
+`analyticsEnabled` is **true** only on the approved Vercel production hostname. App Check is registered and remains in **monitoring mode, not enforcement**. Google owner sign-in and real visitor-to-dashboard delivery were verified on Vercel on 23 October 2026. `/admin` returns HTTP 200 with `X-Robots-Tag: noindex, nofollow`. The first dashboard counts include verification browsing; they are not all independent audience visits.
 
 ## Sites removal
 
@@ -38,7 +38,7 @@ The build creates `dist/admin/index.html` with a noindex directive. This enables
 ## Checks already passed
 
 - TypeScript and production build (rerun after configuration changes).
-- 24 model, contact and GitHub regression checks.
+- 30 model, collector, contact and GitHub regression checks passed for the Vercel migration.
 - 6 collector checks: automatic collection without a consent choice; disabled-rollout exclusion; DNT/GPC, previous decline, blocked storage, owner/admin and local-host exclusions; privacy changes before flush and during identity creation; duplicate visibility and session expiry.
 - 7 Firestore emulator tests: verified owner reads; denied other/anonymous reads; valid atomic writes; schema and time validation; immutable retries; 20-item batches and 60 writes/minute; quota-window reset.
 - Desktop login and real authenticated empty dashboard read. Earlier fixture checks covered the 390px layout, date presets, empty and service-error states; synthetic data never reaches Firestore. A final mobile capture of the real dashboard remains unverified because the browser viewport override did not apply.
