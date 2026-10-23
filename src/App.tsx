@@ -18,7 +18,7 @@ const destinations = [
   { id: "work" as const, label: "Work", number: "02", title: "What I’ve done.", description: "Full-stack apps, AI experiments, and a little play with motion.", link: "Explore the work", icon: Layers3 },
   { id: "contact" as const, label: "Contact", number: "03", title: "Let’s talk.", description: "", link: "Let’s talk", icon: ArrowUpRight },
 ];
-const navigationItems = [...destinations, { id: "github" as const, label: "GitHub Stats" }];
+const navigationItems = [...destinations, { id: "github" as const, label: "Stats" }];
 function HomePage() {
   return <div className="home-page continuous-portfolio">
     <PortraitHero />

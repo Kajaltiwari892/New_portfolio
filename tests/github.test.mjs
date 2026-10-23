@@ -44,7 +44,10 @@ test("malformed responses reject instead of displaying invented values", async (
 
 test("calendar snapshot contains continuous real dated cells", async () => {
   const { contributions } = JSON.parse(await readFile(new URL("../src/data/github-snapshot.json", import.meta.url), "utf8"));
-  assert.ok(contributions.days.length >= 365);
+  assert.equal(contributions.from.slice(5), "01-01");
+  assert.equal(contributions.from.slice(0, 4), contributions.to.slice(0, 4));
+  assert.equal(contributions.days.length, (Date.parse(contributions.to) - Date.parse(contributions.from)) / 86400000 + 1);
+  assert.equal(contributions.total, contributions.days.reduce((sum, day) => sum + day.count, 0));
   contributions.days.forEach((day, index, days) => {
     assert.ok(Number.isInteger(day.count) && day.count >= 0);
     assert.ok(day.level >= 0 && day.level <= 4);
@@ -56,6 +59,14 @@ test("calendar snapshot contains continuous real dated cells", async () => {
 
 test("calendar import fails safely when GitHub markup changes", () => {
   assert.throws(() => parseContributions("<html>Temporarily unavailable</html>"), /markup changed/);
+});
+
+test("calendar import counts only the requested dates, excluding previous-year and future cells", () => {
+  const days = [{ date: "2025-12-31", count: 20 }, { date: "2026-01-01", count: 2 }, { date: "2026-01-02", count: 3 }, { date: "2026-01-03", count: 0 }];
+  const html = '<h2 id="js-contribution-activity-description">25 contributions</h2>' + days.map((day, index) => `<td data-date="${day.date}" id="day-${index}" data-level="1"></td><tool-tip for="day-${index}">${day.count} contributions on this date.</tool-tip>`).join("");
+  const calendar = parseContributions(html, { from: "2026-01-01", to: "2026-01-02" });
+  assert.equal(calendar.total, 5);
+  assert.deepEqual(calendar.days.map(day => day.date), ["2026-01-01", "2026-01-02"]);
 });
 
 test("GitHub route supports direct links while home section URLs still resolve", () => {
