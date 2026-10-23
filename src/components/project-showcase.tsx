@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
-import { ArrowUpRight, ArrowRight, Code2, Box, Expand } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Box, Expand } from "lucide-react";
+import { GitHubIcon } from "@/components/social-icons";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import "@/project-showcase.css";
@@ -14,7 +15,7 @@ export const projects = [
 type Project = typeof projects[number];
 
 function ProjectDetails({ project }: { project: Project }) {
-  return <DialogContent className="project-detail-dialog"><DialogHeader><span className="mini-eyebrow">{project.category}</span><DialogTitle>{project.name}</DialogTitle><DialogDescription>{project.tagline}</DialogDescription></DialogHeader><p>{project.detail}</p><div className="project-detail-skills"><h3>What I worked with</h3><p>{project.skills}</p></div><div className="project-detail-links">{project.live && <Button asChild><a href={project.live} target="_blank" rel="noreferrer">Visit website <ArrowUpRight size={15} /></a></Button>}<Button asChild variant="outline"><a href={project.code} target="_blank" rel="noreferrer">Explore code <Code2 size={15} /></a></Button></div></DialogContent>;
+  return <DialogContent className="project-detail-dialog"><DialogHeader><span className="mini-eyebrow">{project.category}</span><DialogTitle>{project.name}</DialogTitle><DialogDescription>{project.tagline}</DialogDescription></DialogHeader><p>{project.detail}</p><div className="project-detail-skills"><h3>What I worked with</h3><p>{project.skills}</p></div><div className="project-detail-links">{project.live && <Button asChild><a href={project.live} target="_blank" rel="noreferrer">Visit website <ArrowUpRight size={15} /></a></Button>}<Button asChild variant="outline"><a href={project.code} target="_blank" rel="noreferrer"><GitHubIcon size={15} />Explore code</a></Button></div></DialogContent>;
 }
 
 const presentation = {
@@ -74,7 +75,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
     <div className="work-card-preview"><ProjectVisual project={project} /></div>
     <div className="work-card-footer"><ul className="work-tech-list" aria-label={`${project.name} technologies`}>{project.stack.map(tool => <li key={tool}>{tool}</li>)}</ul><div className="work-card-actions">
       {project.live ? <a className="work-primary-action" href={project.live} target="_blank" rel="noreferrer" aria-label={`Visit ${project.name} website (opens in a new tab)`}>Visit website <ArrowUpRight size={15} /></a> : <DialogTrigger asChild><button className="work-primary-action">View project <ArrowUpRight size={15} /></button></DialogTrigger>}
-      {project.live ? <DialogTrigger asChild><button className="work-secondary-action">{project.id === "abhyaas" ? "Project details" : "Details"}<ArrowRight size={14} /></button></DialogTrigger> : <a className="work-secondary-action" href={project.code} target="_blank" rel="noreferrer" aria-label="AIssist on GitHub (opens in a new tab)">GitHub <Code2 size={14} /></a>}
+      {project.live ? <DialogTrigger asChild><button className="work-secondary-action">{project.id === "abhyaas" ? "Project details" : "Details"}<ArrowRight size={14} /></button></DialogTrigger> : <a className="work-secondary-action" href={project.code} target="_blank" rel="noreferrer" aria-label="AIssist on GitHub (opens in a new tab)"><GitHubIcon size={14} />GitHub <ArrowUpRight size={14} /></a>}
     </div></div>
   </article><ProjectDetails project={project} /></Dialog>;
 }

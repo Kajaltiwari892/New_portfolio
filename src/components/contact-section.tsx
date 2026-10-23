@@ -1,6 +1,7 @@
 import { useRef, useState, type FormEvent } from "react";
 import { ArrowUpRight, CheckCircle2, CircleAlert, LoaderCircle, Mail, Send } from "lucide-react";
 import { profile } from "@/portfolio-content";
+import { GitHubIcon, LinkedInIcon } from "@/components/social-icons";
 import { sendContactMessage } from "@/lib/contact";
 
 export function ContactSection() {
@@ -52,8 +53,8 @@ export function ContactSection() {
         <a href={`mailto:${profile.email}`}><Mail size={19} aria-hidden="true" /><span>{profile.email}</span><ArrowUpRight size={17} aria-hidden="true" /></a>
       </div>
       <div className="contact-social-links">
-        {profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn <ArrowUpRight size={15} aria-hidden="true" /></a>}
-        {profile.github && <a href={profile.github} target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={15} aria-hidden="true" /></a>}
+        {profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noreferrer"><LinkedInIcon size={16} />LinkedIn <ArrowUpRight size={15} aria-hidden="true" /></a>}
+        {profile.github && <a href={profile.github} target="_blank" rel="noreferrer"><GitHubIcon size={16} />GitHub <ArrowUpRight size={15} aria-hidden="true" /></a>}
       </div>
     </div>
 

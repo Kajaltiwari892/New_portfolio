@@ -9,6 +9,7 @@ import { Mark } from "@/components/portfolio-pieces";
 import { PortfolioFooter } from "@/components/portfolio-footer";
 import { ProjectShowcase } from "@/components/project-showcase";
 import { ContactSection } from "@/components/contact-section";
+import { GitHubStatsPage } from "@/components/github-stats-page";
 import { parsePortfolioHash, routeHref, type PortfolioRoute } from "@/lib/portfolio-router";
 import { profile } from "@/portfolio-content";
 
@@ -17,6 +18,7 @@ const destinations = [
   { id: "work" as const, label: "Work", number: "02", title: "What I’ve done.", description: "Full-stack apps, AI experiments, and a little play with motion.", link: "Explore the work", icon: Layers3 },
   { id: "contact" as const, label: "Contact", number: "03", title: "Let’s talk.", description: "", link: "Let’s talk", icon: ArrowUpRight },
 ];
+const navigationItems = [...destinations, { id: "github" as const, label: "GitHub Stats" }];
 function HomePage() {
   return <div className="home-page continuous-portfolio">
     <PortraitHero />
@@ -72,7 +74,7 @@ export default function App() {
   useLayoutEffect(() => {
     if (!scrollTarget) return;
     const frame = requestAnimationFrame(() => {
-      const target = document.getElementById(scrollTarget.id);
+      const target = document.getElementById(scrollTarget.id === "github" ? "home" : scrollTarget.id);
       target?.scrollIntoView({ block: "start", behavior: reduceMotion ? "instant" : "smooth" });
       if (scrollTarget.id !== "home") document.getElementById(scrollTarget.id + "-heading")?.focus({ preventScroll: true });
     });
@@ -86,11 +88,11 @@ export default function App() {
   }, []);
   useLayoutEffect(() => {
     document.documentElement.dataset.portfolioReady = "true";
-    document.title = `${profile.name || "Folio"} — Full-stack developer`;
-  }, []);
+    document.title = `${active === "github" ? "GitHub Stats — " : ""}${profile.name || "Folio"}${active === "github" ? "" : " — Full-stack developer"}`;
+  }, [active]);
   return <MotionConfig reducedMotion="user"><TooltipProvider><a className="skip-link" href="#main" onClick={event => { event.preventDefault(); const main = document.getElementById("main"); main?.focus({ preventScroll: true }); main?.scrollIntoView({ behavior: "instant" }); }}>Skip to content</a><div id="home" className="site-shell" data-page="home" onClick={followSectionLink}>
-    <header className="site-header"><a href={routeHref("home")} className="brand" aria-label="Portfolio home"><Mark /><span>{profile.name || "folio"}<i>.</i></span></a><PortfolioNavigation items={destinations} route={active} /><div className="header-actions"><a className="header-contact header-resume" href={profile.resume} target="_blank" rel="noreferrer" aria-label="View resume (PDF, opens in a new tab)">Resume <ArrowUpRight size={16} aria-hidden="true" /></a></div></header>
-    <main id="main" tabIndex={-1}><div className="route-page"><HomePage /></div></main>
+    <header className="site-header"><a href={routeHref("home")} className="brand" aria-label="Portfolio home"><Mark /><span>{profile.name || "folio"}<i>.</i></span></a><PortfolioNavigation items={navigationItems} route={active} /><div className="header-actions"><a className="header-contact header-resume" href={profile.resume} target="_blank" rel="noreferrer" aria-label="View resume (PDF, opens in a new tab)">Resume <ArrowUpRight size={16} aria-hidden="true" /></a></div></header>
+    <main id="main" tabIndex={-1}><div className="route-page">{active === "github" ? <GitHubStatsPage /> : <HomePage />}</div></main>
     <PortfolioFooter />
   </div></TooltipProvider></MotionConfig>;
 }
