@@ -12,13 +12,13 @@
 
 ## Pending before visitor collection
 
-1. Complete the Google sign-in verification. The account chooser stalled in this browser; owner input was requested. Emulator authorization tests have passed, but those are not a substitute for a real owner sign-in.
+1. Completed: Google sign-in as `kanjal55567@gmail.com` and a real Firestore dashboard read were verified at `http://localhost:5173/admin`. The login uses the owner email hint without forcing an account chooser.
 2. Completed: the owner approved Google Cloud terms and the reCAPTCHA Enterprise API was enabled without billing.
 3. Completed: the score-based Web key `Portfolio web App Check` is restricted to the exact production hostname and registered for the Firebase web app. Localhost was not added. Token TTL is one hour.
-4. The public site key is now in `src/data/firebase-public-config.json`. Deploy it and verify valid App Check requests before enforcing Cloud Firestore. The implementation uses `ReCaptchaEnterpriseProvider`; the Classic provider is deprecated.
+4. The public site key is in `src/data/firebase-public-config.json` and has been deployed to the existing private Site. Verify valid App Check requests on that domain before enforcing Cloud Firestore. Hosted browser verification is pending because that Site requires its owner's separate ChatGPT login; no hosting access change was made. The implementation uses `ReCaptchaEnterpriseProvider`; the Classic provider is deprecated.
 5. Verify a controlled visitor event reaches Firestore and is visible only to the owner. Then set `analyticsEnabled` to `true`, build and publish. Consent and approved-host checks still apply.
 
-`analyticsEnabled` is currently **false**, and no real portfolio visitor events have been collected. App Check is registered and is in monitoring mode, not enforcement. Google sign-in now uses the owner email hint without forcing the account chooser; the browser reaches consent but stalls after Continue. Do not claim a completed live tracking rollout until these steps pass.
+`analyticsEnabled` is currently **false**, and no real portfolio visitor events have been collected. App Check is registered and is in monitoring mode, not enforcement. The real owner dashboard correctly shows an empty database. Do not claim a completed live tracking rollout until the hosted protection and event round-trip checks pass.
 
 ## Local development
 
@@ -34,9 +34,9 @@ The build creates `dist/admin/index.html` with a noindex directive. This enables
 
 - TypeScript and production build (rerun after configuration changes).
 - 24 model, contact and GitHub regression checks.
-- 4 collector checks: no request before consent; DNT/GPC and owner/localhost exclusions; withdrawal; duplicate visibility and session expiry.
+- 6 collector checks: no request before consent or after an initial decline; DNT/GPC and owner/localhost exclusions; withdrawal including an in-flight identity request; duplicate visibility and session expiry.
 - 7 Firestore emulator tests: verified owner reads; denied other/anonymous reads; valid atomic writes; schema and time validation; immutable retries; 20-item batches and 60 writes/minute; quota-window reset.
-- Desktop login and 390px mobile dashboard fixture; date presets, empty and service-error states. Synthetic fixture data never reaches Firestore. The browser connection was lost during the final mobile login capture; a real authenticated dashboard read remains unverified.
+- Desktop login and real authenticated empty dashboard read. Earlier fixture checks covered the 390px layout, date presets, empty and service-error states; synthetic data never reaches Firestore. A final mobile capture of the real dashboard remains unverified because the browser viewport override did not apply.
 - Unauthenticated REST reads against the live Firestore database return HTTP 403 `PERMISSION_DENIED`.
 
 The latest Firebase CLI requires Java 21. A portable Microsoft OpenJDK is installed for this task at `C:/Users/kanja/.cache/portfolio-java21/jdk-21.0.12.1+1`; the system Java 17 installation was left unchanged. To run the rules tests in PowerShell:

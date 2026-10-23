@@ -5,14 +5,14 @@ import { readFileSync } from 'node:fs';
 import { webcrypto } from 'node:crypto';
 import ts from 'typescript';
 
-function harness({ hostname='portfolio.example', path='/', dnt='0', gpc=false, exclude=false }={}) {
+function harness({ hostname='portfolio.example', path='/', dnt='0', gpc=false, exclude=false, identityGate }={}) {
   const storage=new Map(exclude ? [['portfolio-analytics-exclude','true']] : []);
-  const sent=[], timers=new Map(); let sdkLoads=0, identities=0, nextTimer=0, now=Date.now();
+  const sent=[], timers=new Map(); let sdkLoads=0, identities=0, forgotten=0, nextTimer=0, now=Date.now();
   const model={exports:{}};
   const compile=source=>ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;
   vm.runInNewContext(compile(readFileSync(new URL('../src/lib/analytics-model.ts',import.meta.url),'utf8')),{exports:model.exports,Date,Map,Set,Object});
   const module={exports:{}};
-  const fakeStore={visitorIdentity:async()=>{identities++; return 'anonymous-test-visitor';},storeEvents:async rows=>sent.push(...rows),forgetVisitor:async()=>{}};
+  const fakeStore={visitorIdentity:async()=>{identities++; await identityGate; return 'anonymous-test-visitor';},storeEvents:async rows=>sent.push(...rows),forgetVisitor:async()=>{forgotten++;}};
   const source=readFileSync(new URL('../src/lib/analytics.ts',import.meta.url),'utf8').replaceAll('import.meta.env','({})');
   const sandbox={exports:module.exports,require:name=> {
     if(name==='./analytics-model') return model.exports;
@@ -23,8 +23,20 @@ function harness({ hostname='portfolio.example', path='/', dnt='0', gpc=false, e
   localStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value),removeItem:key=>storage.delete(key)},
   Date:class extends Date {static now(){return now;}},setTimeout:fn=>{const id=++nextTimer;timers.set(id,fn);return id;},clearTimeout:id=>timers.delete(id)};
   vm.runInNewContext(compile(source),sandbox);
-  return {api:module.exports,sent,storage,sandbox,advance:ms=>now+=ms,get loads(){return sdkLoads;},get identities(){return identities;},async flush(){module.exports.flushAnalytics();await new Promise(setImmediate);await new Promise(setImmediate);}};
+  return {api:module.exports,sent,storage,sandbox,advance:ms=>now+=ms,get loads(){return sdkLoads;},get identities(){return identities;},get forgotten(){return forgotten;},async flush(){module.exports.flushAnalytics();await new Promise(setImmediate);await new Promise(setImmediate);}};
 }
+
+test('declining analytics never loads Firebase or creates an identity',async()=>{
+  const h=harness();h.api.setAnalyticsConsent(false);h.api.trackPage('home');await h.flush();
+  assert.equal(h.loads,0);assert.equal(h.identities,0);assert.equal(h.sent.length,0);
+});
+
+test('withdrawal during sign-in waits for the pending identity then signs it out without sending',async()=>{
+  let finish;const identityGate=new Promise(resolve=>{finish=resolve;});
+  const h=harness({identityGate});h.api.setAnalyticsConsent(true);h.api.trackPage('home');await h.flush();
+  assert.equal(h.identities,1);h.api.setAnalyticsConsent(false);await h.flush();assert.equal(h.forgotten,0);
+  finish();await h.flush();assert.equal(h.sent.length,0);assert.equal(h.forgotten,1);
+});
 test('no Firebase identity or request before opt-in; only allowlisted fields after opt-in',async()=>{
   const h=harness();h.api.trackPage('home');h.api.trackEvent('resume_open','resume');await h.flush();
   assert.equal(h.loads,0);assert.equal(h.sent.length,0);
