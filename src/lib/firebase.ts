@@ -22,7 +22,7 @@ export async function isOwner(user: User | null) {
 export async function ownerSignIn() {
   if (!auth) throw new Error("Admin sign-in is not connected yet.");
   const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: "select_account", login_hint: OWNER_EMAIL });
+  provider.setCustomParameters({ login_hint: OWNER_EMAIL });
   const result = await signInWithPopup(auth, provider);
   if (!await isOwner(result.user)) { await signOut(auth); throw new Error("This dashboard is only available to its owner. Please use the authorized Google account."); }
   try { localStorage.setItem("portfolio-analytics-exclude", "true"); } catch {}

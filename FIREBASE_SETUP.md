@@ -13,12 +13,12 @@
 ## Pending before visitor collection
 
 1. Complete the Google sign-in verification. The account chooser stalled in this browser; owner input was requested. Emulator authorization tests have passed, but those are not a substitute for a real owner sign-in.
-2. Approve Google Cloud terms for reCAPTCHA Enterprise / Fraud Defense Essentials. The API activation screen is prepared; it has not been enabled because accepting terms needs confirmation. Keep billing disabled.
-3. Create a score-based Web key limited to the exact production hostname above. Do not add localhost to the production key. Register it for the Firebase web app in App Check.
-4. Put the public site key in `src/data/firebase-public-config.json` (`appCheckSiteKey`), deploy, and verify valid App Check requests before enforcing Cloud Firestore. The implementation uses `ReCaptchaEnterpriseProvider`; the Classic provider is deprecated.
+2. Completed: the owner approved Google Cloud terms and the reCAPTCHA Enterprise API was enabled without billing.
+3. Completed: the score-based Web key `Portfolio web App Check` is restricted to the exact production hostname and registered for the Firebase web app. Localhost was not added. Token TTL is one hour.
+4. The public site key is now in `src/data/firebase-public-config.json`. Deploy it and verify valid App Check requests before enforcing Cloud Firestore. The implementation uses `ReCaptchaEnterpriseProvider`; the Classic provider is deprecated.
 5. Verify a controlled visitor event reaches Firestore and is visible only to the owner. Then set `analyticsEnabled` to `true`, build and publish. Consent and approved-host checks still apply.
 
-`analyticsEnabled` is currently **false**, and no real portfolio visitor events have been collected. App Check is not yet registered or enforced. Do not claim a completed live tracking rollout until these steps pass.
+`analyticsEnabled` is currently **false**, and no real portfolio visitor events have been collected. App Check is registered and is in monitoring mode, not enforcement. Google sign-in now uses the owner email hint without forcing the account chooser; the browser reaches consent but stalls after Continue. Do not claim a completed live tracking rollout until these steps pass.
 
 ## Local development
 
