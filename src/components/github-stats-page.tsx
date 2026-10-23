@@ -57,7 +57,7 @@ export function GitHubStatsPage() {
   ];
   return <div id="github" className="github-page">
     <a href={routeHref("home")} className="github-back"><ArrowLeft size={14} />Back to portfolio</a>
-    <header className="github-page-heading"><div><p className="github-eyebrow"><GitHubIcon size={16} />GitHub / In the open</p><h1 id="github-heading" tabIndex={-1}>Behind <em>the builds.</em></h1><p>A look at my code, contributions, and what I’m working on.</p></div><a className="github-profile-link" href={profile.github!} target="_blank" rel="noreferrer"><span className="github-profile-mark"><GitHubIcon size={27} /></span><span><strong>@{overview.profile.login}</strong><small>On GitHub since {new Date(overview.profile.created_at).getUTCFullYear()}</small></span><ArrowUpRight size={19} /></a></header>
+    <header className="github-page-heading"><div><p className="github-eyebrow"><GitHubIcon size={16} />GitHub / In the open</p><h1 id="github-heading" tabIndex={-1}>Behind <em>the builds.</em></h1><p>A look at my code, contributions, and what I’m working on.</p></div></header>
     <div className="github-stats-meta" role="status"><span className={status === "live" ? "github-status-dot is-live" : "github-status-dot"} />{status === "live" ? `Profile stats updated ${formatDate(overview.updatedAt)}` : status === "updating" ? "Updating profile stats…" : `Saved profile stats · ${formatDate(overview.updatedAt)}`}</div>
     <dl className="github-metrics">{metrics.map(metric => <div className="github-metric" key={metric.label}><dt><metric.icon size={18} /><span>{metric.label}</span></dt><dd>{metric.value.toLocaleString()}</dd></div>)}</dl>
     <ContributionCalendar />
