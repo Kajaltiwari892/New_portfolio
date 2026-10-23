@@ -26,12 +26,36 @@ test("GitHub pagination includes repositories beyond the first 100", async () =>
   const paths = [];
   const result = await fetchGitHubOverview(async url => {
     paths.push(url);
-    const body = !url.includes("/repos") ? { public_repos: 101, followers: 10 } : url.endsWith("page=1") ? Array.from({ length: 100 }, (_, id) => repository({ id })) : [repository({ id: 101 })];
+    const body = url.includes("/starred?") ? [] : !url.includes("/repos") ? { public_repos: 101, followers: 10 } : url.endsWith("page=1") ? Array.from({ length: 100 }, (_, id) => repository({ id })) : [repository({ id: 101 })];
     return Response.json(body);
   });
   assert.equal(result.repositories.length, 101);
-  assert.equal(paths.length, 3);
-  assert.match(paths[2], /page=2$/);
+  assert.equal(paths.length, 4);
+  assert.ok(paths.some(path => path.includes("/repos?") && path.endsWith("page=2")));
+});
+
+test("profile Stars counts starred repositories independently of stars earned", async () => {
+  const result = await fetchGitHubOverview(async url => Response.json(
+    url.includes("/starred?") ? Array.from({ length: 11 }, (_, id) => ({ id })) :
+      url.includes("/repos?") ? [repository({ stargazers_count: 12 })] : { public_repos: 1, followers: 10 }
+  ));
+  assert.equal(result.starredRepositories, 11);
+  assert.equal(summarizeRepositories(result.repositories).stars, 12);
+});
+
+test("starred repository counts include every page", async () => {
+  const result = await fetchGitHubOverview(async url => Response.json(
+    url.includes("/starred?") ? Array.from({ length: url.endsWith("page=1") ? 100 : 4 }, (_, id) => ({ id })) :
+      url.includes("/repos?") ? [] : { public_repos: 0, followers: 0 }
+  ));
+  assert.equal(result.starredRepositories, 104);
+});
+
+test("an unavailable starred list does not silently replace Stars with zero or stars earned", async () => {
+  await assert.rejects(fetchGitHubOverview(async url =>
+    url.includes("/starred?") ? Response.json({ message: "Unavailable" }, { status: 503 }) :
+      Response.json(url.includes("/repos?") ? [repository()] : { public_repos: 1, followers: 0 })
+  ), /unavailable/);
 });
 
 test("rate limits reject, allowing the page to retain its dated snapshot", async () => {
@@ -39,7 +63,7 @@ test("rate limits reject, allowing the page to retain its dated snapshot", async
 });
 
 test("malformed responses reject instead of displaying invented values", async () => {
-  await assert.rejects(fetchGitHubOverview(async () => Response.json({})), /Invalid GitHub response/);
+  await assert.rejects(fetchGitHubOverview(async url => Response.json(url.includes("/starred?") ? [] : {})), /Invalid GitHub response/);
 });
 
 test("calendar snapshot contains continuous real dated cells", async () => {

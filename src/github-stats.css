@@ -11,11 +11,19 @@
 .github-stats-meta { display: flex; align-items: center; gap: 7px; min-height: 20px; margin-bottom: 12px; font-size: 10px; color: var(--gh-muted); }
 .github-status-dot { width: 5px; height: 5px; border-radius: 50%; background: #ad9b81; }
 .github-status-dot.is-live { background: #6c8058; }
+.github-stats-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+.github-stats-toolbar .github-stats-meta { margin-bottom: 0; }
+.github-refresh { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 5px 0 5px 10px; border: 0; background: transparent; color: var(--gh-muted); font: 400 11px Sansation, sans-serif; cursor: pointer; }
+.github-refresh:disabled { opacity: .55; cursor: wait; }
+.github-refresh:focus-visible { outline: 2px solid #7c7754; outline-offset: 4px; }
 .github-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 0 0 22px; }
 .github-metric { padding: 24px; background: #faf6ee; border: 1px solid var(--gh-line); border-radius: 15px; }
 .github-metric dt { display: flex; align-items: center; gap: 9px; color: var(--gh-muted); font-size: 12px; }
 .github-metric dt svg { color: #8b7458; flex-shrink: 0; }
 .github-metric dd { margin: 18px 0 0; font-size: 40px; font-weight: 700; line-height: 1; letter-spacing: -1px; font-variant-numeric: tabular-nums; }
+.github-metric dd a { display: inline-flex; align-items: center; gap: 9px; }
+.github-metric dd a svg { color: var(--gh-muted); }
+.github-metric dd.github-metric-note { margin: 11px 0 0; color: var(--gh-muted); font-size: 10px; font-weight: 400; line-height: 1.5; letter-spacing: 0; }
 .github-activity { padding: 30px 32px 19px; background: #f6f4e9; border: 1px solid #c9cfb5; border-radius: 20px; box-shadow: 0 8px 30px #514a2805; }
 .github-activity-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; }
 .github-activity .github-eyebrow { color: #69744e; }

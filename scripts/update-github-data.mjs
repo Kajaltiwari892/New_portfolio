@@ -28,5 +28,5 @@ const contributions = contributionPeriods[0];
 const { login, name, public_repos, followers, created_at } = overview.profile;
 const repositories = overview.repositories.map(({ id, name, description, html_url, language, stargazers_count, fork, archived, pushed_at }) => ({ id, name, description, html_url, language, stargazers_count, fork, archived, pushed_at }));
 await mkdir(new URL("../src/data/", import.meta.url), { recursive: true });
-await writeFile(new URL("../src/data/github-snapshot.json", import.meta.url), JSON.stringify({ updatedAt: overview.updatedAt, profile: { login, name, public_repos, followers, created_at }, repositories, contributions, contributionPeriods }, null, 2) + "\n");
+await writeFile(new URL("../src/data/github-snapshot.json", import.meta.url), JSON.stringify({ updatedAt: overview.updatedAt, profile: { login, name, public_repos, followers, created_at }, repositories, starredRepositories: overview.starredRepositories, contributions, contributionPeriods }, null, 2) + "\n");
 console.log(`Saved ${repositories.length} repositories. Contributions: ${contributionPeriods.map(period => `${period.label}: ${period.total}`).join(", ")}.`);

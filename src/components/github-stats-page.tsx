@@ -1,5 +1,5 @@
 import { useEffect, useState, type CSSProperties } from "react";
-import { ArrowLeft, ArrowUpRight, BookOpen, Code2, GitCommitHorizontal, Star, Users } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, BookOpen, Code2, GitCommitHorizontal, RefreshCw, Star, Users } from "lucide-react";
 import { GitHubIcon } from "@/components/social-icons";
 import { getGitHubOverview, summarizeRepositories, type GitHubOverview } from "@/lib/github";
 import { routeHref } from "@/lib/portfolio-router";
@@ -42,24 +42,26 @@ function ContributionCalendar() {
 export function GitHubStatsPage() {
   const [overview, setOverview] = useState<GitHubOverview>(snapshot);
   const [status, setStatus] = useState<"updating" | "live" | "snapshot">("updating");
+  const [refreshCount, setRefreshCount] = useState(0);
   useEffect(() => {
     let mounted = true;
-    getGitHubOverview().then(data => { if (mounted) { setOverview(data); setStatus("live"); } }).catch(() => { if (mounted) setStatus("snapshot"); });
+    setStatus("updating");
+    getGitHubOverview(refreshCount > 0).then(data => { if (mounted) { setOverview(data); setStatus("live"); } }).catch(() => { if (mounted) setStatus("snapshot"); });
     return () => { mounted = false; };
-  }, []);
+  }, [refreshCount]);
   const summary = summarizeRepositories(overview.repositories);
   const languageTotal = summary.languages.reduce((sum, language) => sum + language.count, 0);
   const metrics = [
-    { label: "Public repositories", value: overview.profile.public_repos, icon: BookOpen },
-    { label: "Stars earned", value: summary.stars, icon: Star },
+    { label: "Public repositories", value: overview.profile.public_repos, icon: BookOpen, href: `${profile.github}?tab=repositories&type=public`, note: "Private repositories excluded" },
+    { label: "Stars", value: overview.starredRepositories, icon: Star, href: `${profile.github}?tab=stars`, note: "Repositories I’ve starred" },
     { label: "Followers", value: overview.profile.followers, icon: Users },
     { label: "Primary languages", value: summary.languages.length, icon: Code2 },
   ];
   return <div id="github" className="github-page">
     <a href={routeHref("home")} className="github-back"><ArrowLeft size={14} />Back to portfolio</a>
     <header className="github-page-heading"><div><p className="github-eyebrow"><GitHubIcon size={16} />GitHub / In the open</p><h1 id="github-heading" tabIndex={-1}>Behind <em>the builds.</em></h1><p>A look at my code, contributions, and what I’m working on.</p></div></header>
-    <div className="github-stats-meta" role="status"><span className={status === "live" ? "github-status-dot is-live" : "github-status-dot"} />{status === "live" ? `Profile stats updated ${formatDate(overview.updatedAt)}` : status === "updating" ? "Updating profile stats…" : `Saved profile stats · ${formatDate(overview.updatedAt)}`}</div>
-    <dl className="github-metrics">{metrics.map(metric => <div className="github-metric" key={metric.label}><dt><metric.icon size={18} /><span>{metric.label}</span></dt><dd>{metric.value.toLocaleString()}</dd></div>)}</dl>
+    <div className="github-stats-toolbar"><div className="github-stats-meta" role="status"><span className={status === "live" ? "github-status-dot is-live" : "github-status-dot"} />{status === "live" ? `Profile stats updated ${formatDate(overview.updatedAt)}` : status === "updating" ? "Updating profile stats…" : `Saved profile stats · ${formatDate(overview.updatedAt)}`}</div><button className="github-refresh" type="button" onClick={() => setRefreshCount(count => count + 1)} disabled={status === "updating"} aria-label="Refresh profile stats"><RefreshCw size={12} />Refresh</button></div>
+    <dl className="github-metrics">{metrics.map(metric => <div className="github-metric" key={metric.label}><dt><metric.icon size={18} /><span>{metric.label}</span></dt><dd>{metric.href ? <a href={metric.href} target="_blank" rel="noreferrer" aria-label={`${metric.value} ${metric.label} on GitHub`}>{metric.value.toLocaleString()}<ArrowUpRight size={17} /></a> : metric.value.toLocaleString()}</dd>{metric.note && <dd className="github-metric-note">{metric.note}</dd>}</div>)}</dl>
     <ContributionCalendar />
     <div className="github-details-grid">
       <section className="github-languages" aria-labelledby="github-languages-heading"><p className="github-eyebrow">The toolkit</p><h2 id="github-languages-heading">Languages I build with</h2><p className="github-panel-description">By primary language of my own public repositories.</p><div className="github-language-bar" aria-hidden="true">{summary.languages.map(language => <span key={language.name} style={{ flex: language.count, background: languageColor(language.name) }} />)}</div><ul>{summary.languages.map(language => <li key={language.name}><span><i style={{ background: languageColor(language.name) }} />{language.name}</span><span>{language.count} repos <b>{Math.round(language.count / languageTotal * 100)}%</b></span></li>)}</ul>{summary.languages.length === 0 && <p>No primary languages reported yet.</p>}<p className="github-language-note">Forks excluded.</p></section>
