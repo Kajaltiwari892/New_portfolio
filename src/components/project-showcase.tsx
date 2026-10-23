@@ -3,6 +3,7 @@ import { ArrowUpRight, ArrowRight, Box, Expand } from "lucide-react";
 import { GitHubIcon } from "@/components/social-icons";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { trackEvent } from "@/lib/analytics";
 import "@/project-showcase.css";
 
 export const projects = [
@@ -15,7 +16,7 @@ export const projects = [
 type Project = typeof projects[number];
 
 function ProjectDetails({ project }: { project: Project }) {
-  return <DialogContent className="project-detail-dialog"><DialogHeader><span className="mini-eyebrow">{project.category}</span><DialogTitle>{project.name}</DialogTitle><DialogDescription>{project.tagline}</DialogDescription></DialogHeader><p>{project.detail}</p><div className="project-detail-skills"><h3>What I worked with</h3><p>{project.skills}</p></div><div className="project-detail-links">{project.live && <Button asChild><a href={project.live} target="_blank" rel="noreferrer">Visit website <ArrowUpRight size={15} /></a></Button>}<Button asChild variant="outline"><a href={project.code} target="_blank" rel="noreferrer"><GitHubIcon size={15} />Explore code</a></Button></div></DialogContent>;
+  return <DialogContent className="project-detail-dialog"><DialogHeader><span className="mini-eyebrow">{project.category}</span><DialogTitle>{project.name}</DialogTitle><DialogDescription>{project.tagline}</DialogDescription></DialogHeader><p>{project.detail}</p><div className="project-detail-skills"><h3>What I worked with</h3><p>{project.skills}</p></div><div className="project-detail-links">{project.live && <Button asChild><a data-analytics-event="project_link_click" data-analytics-target={project.id} href={project.live} target="_blank" rel="noreferrer">Visit website <ArrowUpRight size={15} /></a></Button>}<Button asChild variant="outline"><a data-analytics-event="project_code_click" data-analytics-target={project.id} href={project.code} target="_blank" rel="noreferrer"><GitHubIcon size={15} />Explore code</a></Button></div></DialogContent>;
 }
 
 const presentation = {
@@ -70,12 +71,12 @@ function ProjectVisual({ project }: { project: Project }) {
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   const copy = presentation[project.id];
-  return <Dialog><article className={`work-card work-card-${project.id}`} aria-labelledby={`${project.id}-title`}>
+  return <Dialog onOpenChange={open => { if (open) trackEvent("project_details_open", project.id); }}><article data-analytics-project={project.id} className={`work-card work-card-${project.id}`} aria-labelledby={`${project.id}-title`}>
     <div className="work-card-copy"><div className="work-card-meta"><span><b className="work-project-index">0{index + 1}</b>{copy.label}</span><span>{copy.note}</span></div><h3 id={`${project.id}-title`}>{project.name}</h3><p className="work-card-intro">{copy.intro}</p>{"body" in copy && <p className="work-card-description">{copy.body}</p>}</div>
     <div className="work-card-preview"><ProjectVisual project={project} /></div>
     <div className="work-card-footer"><ul className="work-tech-list" aria-label={`${project.name} technologies`}>{project.stack.map(tool => <li key={tool}>{tool}</li>)}</ul><div className="work-card-actions">
-      {project.live ? <a className="work-primary-action" href={project.live} target="_blank" rel="noreferrer" aria-label={`Visit ${project.name} website (opens in a new tab)`}>Visit website <ArrowUpRight size={15} /></a> : <DialogTrigger asChild><button className="work-primary-action">View project <ArrowUpRight size={15} /></button></DialogTrigger>}
-      {project.live ? <DialogTrigger asChild><button className="work-secondary-action">{project.id === "abhyaas" ? "Project details" : "Details"}<ArrowRight size={14} /></button></DialogTrigger> : <a className="work-secondary-action" href={project.code} target="_blank" rel="noreferrer" aria-label="AIssist on GitHub (opens in a new tab)"><GitHubIcon size={14} />GitHub <ArrowUpRight size={14} /></a>}
+      {project.live ? <a className="work-primary-action" data-analytics-event="project_link_click" data-analytics-target={project.id} href={project.live} target="_blank" rel="noreferrer" aria-label={`Visit ${project.name} website (opens in a new tab)`}>Visit website <ArrowUpRight size={15} /></a> : <DialogTrigger asChild><button className="work-primary-action">View project <ArrowUpRight size={15} /></button></DialogTrigger>}
+      {project.live ? <DialogTrigger asChild><button className="work-secondary-action">{project.id === "abhyaas" ? "Project details" : "Details"}<ArrowRight size={14} /></button></DialogTrigger> : <a className="work-secondary-action" data-analytics-event="project_code_click" data-analytics-target={project.id} href={project.code} target="_blank" rel="noreferrer" aria-label="AIssist on GitHub (opens in a new tab)"><GitHubIcon size={14} />GitHub <ArrowUpRight size={14} /></a>}
     </div></div>
   </article><ProjectDetails project={project} /></Dialog>;
 }

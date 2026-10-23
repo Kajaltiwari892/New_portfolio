@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function owner() {
+      return request.auth != null
+        && request.auth.token.email == 'kanjal55567@gmail.com'
+        && request.auth.token.email_verified == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+    function visitor() { return request.auth != null && request.auth.token.firebase.sign_in_provider == 'anonymous'; }
+    function id(value) { return value is string && value.matches('^[a-zA-Z0-9-]{20,64}$'); }
+    function targetAllowed(d) {
+      return (d.name == 'page_view' && d.target == d.page)
+        || (d.name == 'section_view' && d.target in ['home', 'about', 'work', 'contact', 'stats'])
+        || (d.name in ['project_view', 'project_details_open', 'project_link_click', 'project_code_click'] && d.target in ['abhyaas', 'resumeiq', 'aissist', 'fizzi'])
+        || (d.name == 'resume_open' && d.target == 'resume')
+        || (d.name == 'social_click' && d.target in ['github', 'linkedin'])
+        || (d.name in ['contact_start', 'contact_submit_accepted', 'contact_submit_failed'] && d.target == 'contact');
+    }
+    function validEvent(eventId) {
+      let d = request.resource.data;
+      let budget = getAfter(/databases/$(database)/documents/analytics_writers/$(request.auth.uid)).data;
+      return d.keys().hasOnly(['v', 'id', 'visitorId', 'sessionId', 'pageViewId', 'name', 'target', 'page', 'at', 'device', 'referrer'])
+        && d.v == 1 && d.id == eventId && id(d.id) && id(d.sessionId) && id(d.pageViewId)
+        && d.visitorId == request.auth.uid && d.page in ['home', 'stats']
+        && d.at is int && d.at <= request.time.toMillis() + 60000 && d.at >= request.time.toMillis() - 900000
+        && d.device in ['mobile', 'tablet', 'desktop']
+        && d.referrer is string && d.referrer.size() <= 200 && d.referrer.matches('^[a-zA-Z0-9.-]*$')
+        && targetAllowed(d) && budget.updatedAt == request.time && eventId in budget.ids;
+    }
+    match /analytics_events/{eventId} {
+      allow read: if owner();
+      allow create: if visitor() && validEvent(eventId);
+      // Network retries may write an identical event; its time and contents cannot change.
+      allow update: if visitor() && validEvent(eventId) && request.resource.data == resource.data;
+      allow delete: if false;
+    }
+    match /analytics_writers/{uid} {
+      function validBudget() {
+        let d = request.resource.data;
+        return visitor() && request.auth.uid == uid
+          && d.keys().hasOnly(['windowStart', 'updatedAt', 'count', 'ids'])
+          && d.updatedAt == request.time && d.windowStart is timestamp
+          && d.ids is list && d.ids.size() > 0 && d.ids.size() <= 20
+          && d.count is int && d.count >= d.ids.size() && d.count <= 60;
+      }
+      allow get: if visitor() && request.auth.uid == uid;
+      allow create: if validBudget() && request.resource.data.windowStart == request.time && request.resource.data.count == request.resource.data.ids.size();
+      allow update: if validBudget() && (
+        (request.time < resource.data.windowStart + duration.value(60, 's') && request.resource.data.windowStart == resource.data.windowStart && request.resource.data.count == resource.data.count + request.resource.data.ids.size())
+        || (request.time >= resource.data.windowStart + duration.value(60, 's') && request.resource.data.windowStart == request.time && request.resource.data.count == request.resource.data.ids.size())
+      );
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

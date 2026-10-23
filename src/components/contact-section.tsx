@@ -3,6 +3,7 @@ import { ArrowUpRight, CheckCircle2, CircleAlert, LoaderCircle, Mail, Send } fro
 import { profile } from "@/portfolio-content";
 import { GitHubIcon, LinkedInIcon } from "@/components/social-icons";
 import { sendContactMessage } from "@/lib/contact";
+import { trackEvent } from "@/lib/analytics";
 
 export function ContactSection() {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
@@ -35,9 +36,11 @@ export function ContactSection() {
       });
       form.reset();
       setStatus("success");
+      trackEvent("contact_submit_accepted", "contact");
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Something went wrong. Please try again.");
       setStatus("error");
+      trackEvent("contact_submit_failed", "contact");
     } finally {
       requestPending.current = false;
     }
@@ -53,12 +56,12 @@ export function ContactSection() {
         <a href={`mailto:${profile.email}`}><Mail size={19} aria-hidden="true" /><span>{profile.email}</span><ArrowUpRight size={17} aria-hidden="true" /></a>
       </div>
       <div className="contact-social-links">
-        {profile.linkedin && <a href={profile.linkedin} target="_blank" rel="noreferrer"><LinkedInIcon size={16} />LinkedIn <ArrowUpRight size={15} aria-hidden="true" /></a>}
-        {profile.github && <a href={profile.github} target="_blank" rel="noreferrer"><GitHubIcon size={16} />GitHub <ArrowUpRight size={15} aria-hidden="true" /></a>}
+        {profile.linkedin && <a data-analytics-event="social_click" data-analytics-target="linkedin" href={profile.linkedin} target="_blank" rel="noreferrer"><LinkedInIcon size={16} />LinkedIn <ArrowUpRight size={15} aria-hidden="true" /></a>}
+        {profile.github && <a data-analytics-event="social_click" data-analytics-target="github" href={profile.github} target="_blank" rel="noreferrer"><GitHubIcon size={16} />GitHub <ArrowUpRight size={15} aria-hidden="true" /></a>}
       </div>
     </div>
 
-    <form className="contact-message-form" onSubmit={submitMessage} onChange={() => { if (status !== "sending") setStatus("idle"); }} aria-labelledby="contact-form-heading" aria-busy={status === "sending"}>
+    <form onFocusCapture={() => trackEvent("contact_start", "contact", true)} className="contact-message-form" onSubmit={submitMessage} onChange={() => { if (status !== "sending") setStatus("idle"); }} aria-labelledby="contact-form-heading" aria-busy={status === "sending"}>
       <div className="contact-form-heading"><h3 id="contact-form-heading">Send a message</h3><p>I’ll reply to the email you leave below.</p></div>
       <input type="text" name="_honey" className="contact-honeypot" tabIndex={-1} autoComplete="off" aria-hidden="true" />
       <div className="contact-field-row">

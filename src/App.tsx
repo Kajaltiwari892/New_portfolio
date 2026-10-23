@@ -12,6 +12,7 @@ import { ContactSection } from "@/components/contact-section";
 import { GitHubStatsPage } from "@/components/github-stats-page";
 import { parsePortfolioHash, routeHref, type PortfolioRoute } from "@/lib/portfolio-router";
 import { profile } from "@/portfolio-content";
+import { PortfolioAnalytics } from "@/components/portfolio-analytics";
 
 const destinations = [
   { id: "about" as const, label: "About", number: "01", title: "A little more about me.", description: "", link: "Get to know me", icon: PenTool },
@@ -22,7 +23,7 @@ const navigationItems = [...destinations, { id: "github" as const, label: "Stats
 function HomePage() {
   return <div className="home-page continuous-portfolio">
     <PortraitHero />
-    {destinations.map(item => <section key={item.id} id={item.id} className={"portfolio-section section-" + item.id} aria-labelledby={item.id + "-heading"}>
+    {destinations.map(item => <section key={item.id} id={item.id} data-analytics-section={item.id} className={"portfolio-section section-" + item.id} aria-labelledby={item.id + "-heading"}>
         <div className="portfolio-section-inner">
           {item.id !== "work" && <header className="portfolio-section-heading">
             <div><p className="section-index"><span>{item.number}</span> / {item.label}</p><h2 id={item.id + "-heading"} tabIndex={-1}>{item.title}</h2></div>
@@ -46,7 +47,7 @@ function ContactPage() {
 
 export default function App() {
   const reduceMotion = useReducedMotion();
-  const [active, setActive] = useState<PortfolioRoute>("home");
+  const [active, setActive] = useState<PortfolioRoute>(() => { const route = parsePortfolioHash(window.location.hash); return route === "not-found" ? "home" : route; });
   const [scrollTarget, setScrollTarget] = useState<{ id: string } | null>(null);
   const navigate = useCallback((target: PortfolioRoute, updateHistory = true) => {
     const id = target === "not-found" ? "home" : target;
@@ -91,8 +92,9 @@ export default function App() {
     document.title = `${active === "github" ? "GitHub Stats — " : ""}${profile.name || "Folio"}${active === "github" ? "" : " — Full-stack developer"}`;
   }, [active]);
   return <MotionConfig reducedMotion="user"><TooltipProvider><a className="skip-link" href="#main" onClick={event => { event.preventDefault(); const main = document.getElementById("main"); main?.focus({ preventScroll: true }); main?.scrollIntoView({ behavior: "instant" }); }}>Skip to content</a><div id="home" className="site-shell" data-page="home" onClick={followSectionLink}>
-    <header className="site-header"><a href={routeHref("home")} className="brand" aria-label="Portfolio home"><Mark /><span>{profile.name || "folio"}<i>.</i></span></a><PortfolioNavigation items={navigationItems} route={active} /><div className="header-actions"><a className="header-contact header-resume" href={profile.resume} target="_blank" rel="noreferrer" aria-label="View resume (PDF, opens in a new tab)">Resume <ArrowUpRight size={16} aria-hidden="true" /></a></div></header>
+    <header className="site-header"><a href={routeHref("home")} className="brand" aria-label="Portfolio home"><Mark /><span>{profile.name || "folio"}<i>.</i></span></a><PortfolioNavigation items={navigationItems} route={active} /><div className="header-actions"><a className="header-contact header-resume" data-analytics-event="resume_open" data-analytics-target="resume" href={profile.resume} target="_blank" rel="noreferrer" aria-label="View resume (PDF, opens in a new tab)">Resume <ArrowUpRight size={16} aria-hidden="true" /></a></div></header>
     <main id="main" tabIndex={-1}><div className="route-page">{active === "github" ? <GitHubStatsPage /> : <HomePage />}</div></main>
     <PortfolioFooter />
+    <PortfolioAnalytics page={active === "github" ? "stats" : "home"} />
   </div></TooltipProvider></MotionConfig>;
 }

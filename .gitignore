@@ -2,3 +2,8 @@ node_modules/
 dist/
 .sites-local/
 *.tar.gz
+ADMIN_ANALYTICS_PLAN.md/
+.env*
+!.env.example
+.firebase/
+*-debug.log

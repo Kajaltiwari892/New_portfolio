@@ -1,5 +1,11 @@
 # Folio personal portfolio
 
+## Private portfolio analytics
+
+The new `/admin` route uses Firebase Google sign-in and Firestore rules restricted to `kanjal55567@gmail.com`. See [the implementation plan](ADMIN_ANALYTICS_PLAN.md) and [setup status and verification](FIREBASE_SETUP.md). Visitor collection stays disabled until the remaining App Check setup is complete. The public navbar's **Stats** page remains GitHub activity.
+
+Run `node --test tests/analytics.test.mjs tests/analytics-collector.test.mjs tests/contact.test.mjs tests/github.test.mjs` for regression tests. `npm run test:rules` checks database authorization in an isolated demo emulator and requires Java 21+. `/tests/admin-ui.html` is a local-only visual fixture with explicitly synthetic data; it is not included in the production build.
+
 ## Contact form and resume
 
 The contact form sends name, email, and message to [FormSubmit’s AJAX endpoint](https://formsubmit.co/ajax-documentation) for delivery to `kanjal55567@gmail.com`, using the public endpoint identifier supplied in the owner's activation email. Visitors stay on the portfolio. The form shows sending, accepted, and error states; it retains the message after a failure and prevents duplicate clicks while a request is pending. The sender's email is the reply-to address. A hidden honeypot is included; no CAPTCHA-disabling option is sent.

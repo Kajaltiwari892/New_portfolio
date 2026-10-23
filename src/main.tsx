@@ -12,7 +12,10 @@ import "./project-editorial.css";
 import "./contact-section.css";
 import "./github-stats.css";
 
+const AdminPage = React.lazy(() => import("./admin/AdminPage"));
+const adminRoute = /^\/admin(?:\/|$)/.test(window.location.pathname);
+
 ReactDOM.createRoot(document.getElementById("app")!).render(
-  <React.StrictMode><App /></React.StrictMode>
+  <React.StrictMode>{adminRoute ? <React.Suspense fallback={<p role="status" style={{ padding: "48px", color: "#796b59" }}>Opening your workspace…</p>}><AdminPage /></React.Suspense> : <App />}</React.StrictMode>
 );
 
