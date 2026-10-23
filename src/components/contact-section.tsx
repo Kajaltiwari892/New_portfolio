@@ -32,7 +32,6 @@ export function ContactSection() {
         email: String(data.get("email") ?? "").trim(),
         message: String(data.get("message") ?? ""),
         _honey: String(data.get("_honey") ?? ""),
-        _url: window.location.href,
       });
       form.reset();
       setStatus("success");

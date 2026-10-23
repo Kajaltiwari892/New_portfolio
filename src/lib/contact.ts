@@ -1,12 +1,11 @@
-// Public form endpoint supplied in the owner's FormSubmit activation email.
-export const contactEndpoint = "https://formsubmit.co/ajax/5f600185da3402c8f5c5b0090ac2bf7a";
+// Same-origin delivery: mobile browsers only need to reach the portfolio.
+export const contactEndpoint = "/api/contact";
 
 export type ContactMessage = {
   name: string;
   email: string;
   message: string;
   _honey: string;
-  _url: string;
 };
 
 export class ContactDeliveryError extends Error {
@@ -18,7 +17,7 @@ export class ContactDeliveryError extends Error {
 
 export async function sendContactMessage(
   message: ContactMessage,
-  { fetchRequest = fetch, timeoutMs = 20000 }: { fetchRequest?: typeof fetch; timeoutMs?: number } = {},
+  { fetchRequest = fetch, timeoutMs = 15000 }: { fetchRequest?: typeof fetch; timeoutMs?: number } = {},
 ) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -26,14 +25,8 @@ export async function sendContactMessage(
   try {
     const response = await fetchRequest(contactEndpoint, {
       method: "POST",
-      // URL-encoded form data avoids an unnecessary cross-origin preflight.
-      headers: { Accept: "application/json" },
-      body: new URLSearchParams({
-        ...message,
-        _replyto: message.email,
-        _subject: "New message from Kajal’s portfolio",
-        _template: "table",
-      }),
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(message),
       signal: controller.signal,
     });
     const result: unknown = await response.json();
@@ -41,17 +34,17 @@ export async function sendContactMessage(
     const receipt = result as { success?: unknown; message?: unknown };
     const providerMessage = typeof receipt.message === "string" ? receipt.message : "";
 
-    // An activation response is not confirmation that the message was delivered.
+    // A provider/setup failure must never be presented as a successful send.
     if (/activat|confirm.{0,30}(email|form)|check your email/i.test(providerMessage)) {
       throw new ContactDeliveryError("Messaging is temporarily unavailable. Please email me directly. Your message is still here.");
     }
-    if (!response.ok || (receipt.success !== true && receipt.success !== "true")) {
-      throw new Error("Message was not accepted");
+    if (!response.ok || receipt.success !== true) {
+      throw new ContactDeliveryError(providerMessage || "I couldn’t send your message. Your message is still here—please try again shortly.");
     }
   } catch (error) {
     if (error instanceof ContactDeliveryError) throw error;
     if (controller.signal.aborted) {
-      throw new ContactDeliveryError("This is taking too long, so I couldn’t confirm your message was sent. Your message is still here—you can retry or email me directly.");
+      throw new ContactDeliveryError("The connection timed out, so I couldn’t confirm delivery. Your message is still here.");
     }
     throw new ContactDeliveryError("I couldn’t confirm your message was sent. Please try again or email me directly. Your message is still here.");
   } finally {
