@@ -28,7 +28,11 @@
 .github-activity h2 { margin: 14px 0 6px; font-size: 17px; font-weight: 400; letter-spacing: -.3px; }
 .github-activity h2 strong { margin-right: 6px; font-size: 40px; font-weight: 700; color: #4f5c3d; letter-spacing: -1px; }
 .github-activity-top > div > p:last-child { color: #7b806b; font-size: 11px; }
-.github-calendar-period { border: 1px solid #cbd1bc; border-radius: 999px; padding: 7px 12px; color: #626e4d; font-size: 10px; }
+.github-periods { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: 360px; }
+.github-periods button { min-height: 40px; border: 1px solid #cbd1bc; border-radius: 999px; padding: 8px 13px; background: transparent; color: #626e4d; font: 400 11px Sansation, sans-serif; cursor: pointer; transition: background .2s, color .2s; }
+.github-periods button:hover { background: #e6ebd9; }
+.github-periods button[aria-pressed="true"] { border-color: #596b46; background: #596b46; color: #fffdf3; }
+.github-periods button:focus-visible { outline: 2px solid #596b46; outline-offset: 3px; }
 .github-calendar-scroll { max-width: 100%; overflow-x: auto; padding: 28px 2px 13px; scrollbar-width: thin; scrollbar-color: #a5b08e transparent; }
 .github-calendar { display: grid; grid-template-columns: 29px minmax(0, 1fr); grid-template-rows: 22px auto; column-gap: 9px; min-width: 710px; }
 .github-calendar-months { grid-column: 2; display: grid; grid-template-columns: repeat(var(--weeks), minmax(0, 1fr)); gap: 4px; color: #6e765f; font-size: 10px; }
@@ -109,7 +113,8 @@
   .github-metric dd { font-size: 34px; margin-top: 13px; }
   .github-activity { padding: 24px 18px 15px; border-radius: 16px; }
   .github-activity-top { flex-wrap: wrap; }
-  .github-calendar-period { display: none; }
+  .github-periods { justify-content: flex-start; max-width: none; width: 100%; margin-top: 8px; }
+  .github-periods button { min-height: 44px; padding-inline: 12px; }
   .github-calendar-bottom { flex-wrap: wrap; gap: 14px; }
   .github-day-picker { flex-wrap: wrap; gap: 8px; }
   .github-day-picker input { font-size: 12px; min-height: 40px; }

@@ -9,9 +9,10 @@ import { profile } from "@/portfolio-content";
 const formatDate = (value: string, month: "short" | "long" = "short") => new Date(value).toLocaleDateString("en-GB", { day: "numeric", month, year: "numeric", timeZone: "UTC" });
 const languageColors: Record<string, string> = { JavaScript: "#b69a54", TypeScript: "#667b67", HTML: "#b37559", CSS: "#9181a0", Python: "#66818c" };
 const languageColor = (name: string) => languageColors[name] ?? "#8e8170";
-const activity = snapshot.contributions;
 
 function ContributionCalendar() {
+  const [periodId, setPeriodId] = useState("current");
+  const activity = snapshot.contributionPeriods.find(period => period.id === periodId) ?? snapshot.contributions;
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const selectedDay = activity.days.find(day => day.date === selectedDate);
   const activeDays = activity.days.filter(day => day.count > 0).length;
@@ -20,7 +21,7 @@ function ContributionCalendar() {
   const weeks = Math.ceil((activity.days.length + startOffset) / 7);
   const months = activity.days.flatMap((day, index) => index === 0 || day.date.endsWith("-01") ? [{ label: new Date(day.date).toLocaleDateString("en", { month: "short", timeZone: "UTC" }), column: Math.floor((index + startOffset) / 7) + 1 }] : []);
   return <section className="github-activity" aria-labelledby="github-activity-heading">
-    <div className="github-activity-top"><div><p className="github-eyebrow"><GitCommitHorizontal size={15} />The contribution trail</p><h2 id="github-activity-heading"><strong>{activity.total.toLocaleString()}</strong> contributions</h2><p>{formatDate(activity.from)} — {formatDate(activity.to)}</p></div><span className="github-calendar-period">{activity.from.slice(0, 4)} activity</span></div>
+    <div className="github-activity-top"><div><p className="github-eyebrow"><GitCommitHorizontal size={15} />The contribution trail</p><h2 id="github-activity-heading"><strong>{activity.total.toLocaleString()}</strong> contributions</h2><p>{formatDate(activity.from)} — {formatDate(activity.to)}</p></div><div className="github-periods" role="group" aria-label="Contribution period">{snapshot.contributionPeriods.map(period => <button type="button" key={period.id} aria-pressed={periodId === period.id} onClick={() => { setPeriodId(period.id); setSelectedDate(null); }}>{period.label}</button>)}</div></div>
     <div className="github-calendar-scroll" role="region" aria-label="Contribution calendar. Scroll horizontally on smaller screens." tabIndex={0}>
       <div className="github-calendar" style={{ "--weeks": weeks } as CSSProperties}>
         <div className="github-calendar-months" aria-hidden="true">{months.map(month => <span key={month.column} style={{ gridColumn: month.column }}>{month.label}</span>)}</div>
@@ -31,9 +32,9 @@ function ContributionCalendar() {
         </div>
       </div>
     </div>
-    <p className="github-calendar-hint">Swipe to explore {activity.from.slice(0, 4)} activity →</p>
+    <p className="github-calendar-hint">Swipe to explore the selected period →</p>
     <div className="github-calendar-bottom"><div className="github-day-picker"><label htmlFor="contribution-date">Explore a day</label><input id="contribution-date" type="date" min={activity.from} max={activity.to} value={selectedDate ?? ""} onInput={event => setSelectedDate(event.currentTarget.value)} onChange={event => setSelectedDate(event.target.value)} /></div><div className="github-calendar-legend" aria-label="Darker squares mean more contributions"><span>Less</span>{[0, 1, 2, 3, 4].map(level => <i key={level} data-level={level} />)}<span>More</span></div></div>
-    <p className="github-day-detail" role="status">{selectedDay ? `${formatDate(selectedDay.date, "long")} · ${selectedDay.count} ${selectedDay.count === 1 ? "contribution" : "contributions"}` : `${activeDays} active days · ${bestDay} contributions on the busiest day`}</p>
+    <p className="github-day-detail" role="status">{selectedDay ? `${formatDate(selectedDay.date, "long")} · ${selectedDay.count} ${selectedDay.count === 1 ? "contribution" : "contributions"}` : `${activity.label} · ${activeDays} active days · ${bestDay} contributions on the busiest day`}</p>
     <div className="github-calendar-source"><span>Calendar snapshot · {formatDate(snapshot.updatedAt)}</span><a href={profile.github!} target="_blank" rel="noreferrer">Latest activity on GitHub <ArrowUpRight size={14} /></a></div>
   </section>;
 }

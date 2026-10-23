@@ -61,6 +61,20 @@ test("calendar import fails safely when GitHub markup changes", () => {
   assert.throws(() => parseContributions("<html>Temporarily unavailable</html>"), /markup changed/);
 });
 
+test("every selectable period has complete dates and a total matching its daily counts", async () => {
+  const { contributions, contributionPeriods } = JSON.parse(await readFile(new URL("../src/data/github-snapshot.json", import.meta.url), "utf8"));
+  assert.deepEqual(contributionPeriods.find(period => period.id === "current"), contributions);
+  assert.ok(contributionPeriods.some(period => period.id === "last12months"));
+  assert.equal(new Set(contributionPeriods.map(period => period.id)).size, contributionPeriods.length);
+  for (const period of contributionPeriods) {
+    assert.equal(period.total, period.days.reduce((sum, day) => sum + day.count, 0));
+    assert.equal(period.days.length, (Date.parse(period.to) - Date.parse(period.from)) / 86400000 + 1);
+    period.days.forEach((day, index, days) => {
+      if (index) assert.equal(Date.parse(day.date) - Date.parse(days[index - 1].date), 86400000);
+    });
+  }
+});
+
 test("calendar import counts only the requested dates, excluding previous-year and future cells", () => {
   const days = [{ date: "2025-12-31", count: 20 }, { date: "2026-01-01", count: 2 }, { date: "2026-01-02", count: 3 }, { date: "2026-01-03", count: 0 }];
   const html = '<h2 id="js-contribution-activity-description">25 contributions</h2>' + days.map((day, index) => `<td data-date="${day.date}" id="day-${index}" data-level="1"></td><tool-tip for="day-${index}">${day.count} contributions on this date.</tool-tip>`).join("");
